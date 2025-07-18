@@ -1,4 +1,5 @@
 import { StyleSheet, Text, View, SafeAreaView, StatusBar, ScrollView, Image } from 'react-native';
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import React, { useEffect, useState } from 'react';
 import AppColor from '../../services/styles/AppColor';
 import { GoogleSignin, User } from '@react-native-google-signin/google-signin';
@@ -70,7 +71,7 @@ const ProfileTabView = () => {
               {achievements.map(a => (
                 <View key={a.id} style={styles.achievementItem}>
                   <View style={styles.achievementIconCircle}>
-                    <Image source={require('../../assets/images/trophy.png')} style={styles.achievementIcon} />
+                    <Icon name={a.icon} size={28} color={AppColor.text} />
                   </View>
                   <Text style={styles.achievementLabel}>{a.label}</Text>
                 </View>
