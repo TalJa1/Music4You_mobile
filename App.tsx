@@ -1,28 +1,67 @@
-/**
- * Sample React Native App
- * https://github.com/facebook/react-native
- *
- * @format
- */
+import * as React from 'react';
+import { NavigationContainer } from '@react-navigation/native';
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 
-import { NewAppScreen } from '@react-native/new-app-screen';
-import { StatusBar, StyleSheet, useColorScheme, View } from 'react-native';
+import LoginView from './views/LoginView';
+import LearnTabView from './views/bottomtabs/LearnTabView';
+import SongsTabView from './views/bottomtabs/SongsTabView';
+import CommunityTabView from './views/bottomtabs/CommunityTabView';
+import ProfileTabView from './views/bottomtabs/ProfileTabView';
 
-function App() {
-  const isDarkMode = useColorScheme() === 'dark';
+const Stack = createNativeStackNavigator();
+const Tab = createBottomTabNavigator();
 
+
+const getTabBarIcon = (routeName: string) => {
+  let iconName = '';
+  if (routeName === 'Learn') {
+    iconName = 'book-open-variant';
+  } else if (routeName === 'Songs') {
+    iconName = 'music-note';
+  } else if (routeName === 'Community') {
+    iconName = 'account-group';
+  } else if (routeName === 'Profile') {
+    iconName = 'account-circle';
+  }
+  return iconName;
+};
+
+function MainTabs() {
   return (
-    <View style={styles.container}>
-      <StatusBar barStyle={isDarkMode ? 'light-content' : 'dark-content'} />
-      <NewAppScreen templateFileName="App.tsx" />
-    </View>
+    <Tab.Navigator
+      screenOptions={({ route }) => ({
+        tabBarIcon: ({ color, size }) => (
+          <Icon name={getTabBarIcon(route.name)} size={size} color={color} />
+        ),
+        tabBarActiveTintColor: '#1976d2',
+        tabBarInactiveTintColor: 'gray',
+      })}
+    >
+      <Tab.Screen name="Learn" component={LearnTabView} />
+      <Tab.Screen name="Songs" component={SongsTabView} />
+      <Tab.Screen name="Community" component={CommunityTabView} />
+      <Tab.Screen name="Profile" component={ProfileTabView} />
+    </Tab.Navigator>
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-});
+export default function App() {
+  // Replace with real auth logic
+  const [isLoggedIn, setIsLoggedIn] = React.useState(false);
 
-export default App;
+  return (
+    <NavigationContainer>
+      <Stack.Navigator screenOptions={{ headerShown: false }}>
+        {!isLoggedIn ? (
+          <Stack.Screen name="Login">
+            {() => <LoginView onLogin={() => setIsLoggedIn(true)} />}
+          </Stack.Screen>
+        ) : (
+          <Stack.Screen name="Main" component={MainTabs} />
+        )}
+      </Stack.Navigator>
+    </NavigationContainer>
+  );
+}
