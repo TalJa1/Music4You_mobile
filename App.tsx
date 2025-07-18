@@ -10,6 +10,7 @@ import LearnTabView from './views/bottomtabs/LearnTabView';
 import SongsTabView from './views/bottomtabs/SongsTabView';
 import CommunityTabView from './views/bottomtabs/CommunityTabView';
 import ProfileTabView from './views/bottomtabs/ProfileTabView';
+import AppColor from './services/styles/AppColor';
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -36,8 +37,9 @@ function MainTabs() {
         tabBarIcon: ({ color, size }) => (
           <Icon name={getTabBarIcon(route.name)} size={size} color={color} />
         ),
-        tabBarActiveTintColor: '#1976d2',
+        tabBarActiveTintColor: AppColor.background,
         tabBarInactiveTintColor: 'gray',
+        headerShown: false,
       })}
     >
       <Tab.Screen name="Learn" component={LearnTabView} />
