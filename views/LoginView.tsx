@@ -1,4 +1,5 @@
-import { StyleSheet, Text, View, Button, Alert } from 'react-native';
+/* eslint-disable react-native/no-inline-styles */
+import { StyleSheet, Text, View, Button, Alert, SafeAreaView, ScrollView } from 'react-native';
 import React, { useEffect } from 'react';
 import {
   GoogleSignin,
@@ -39,10 +40,14 @@ const LoginView: React.FC<LoginViewProps> = ({ onLogin }) => {
   };
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>LoginView</Text>
-      <Button title="Sign in with Google" onPress={handleGoogleSignIn} />
-    </View>
+    <SafeAreaView style={{ flex: 1 }}>
+      <ScrollView contentContainerStyle={{ flexGrow: 1 }} keyboardShouldPersistTaps="handled">
+        <View style={styles.container}>
+          <Text style={styles.title}>LoginView</Text>
+          <Button title="Sign in with Google" onPress={handleGoogleSignIn} />
+        </View>
+      </ScrollView>
+    </SafeAreaView>
   );
 };
 
