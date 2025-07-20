@@ -1,5 +1,6 @@
 /* eslint-disable react-native/no-inline-styles */
 import { StyleSheet, Text, View, SafeAreaView, StatusBar, ScrollView, ActivityIndicator, RefreshControl } from 'react-native';
+import YoutubePlayer from 'react-native-youtube-iframe';
 import React, { useEffect, useState } from 'react';
 import AppColor from '../../services/styles/AppColor';
 import { getSongs } from '../../apis/bottomtabs_api/song_api';
@@ -64,6 +65,15 @@ const SongsTabView = () => {
             <View key={song.id} style={styles.songItem}>
               <Text style={styles.songTitle}>{song.title}</Text>
               <Text style={styles.songArtist}>{song.artist}</Text>
+              {song.video_id ? (
+                <View style={styles.youtubeContainer}>
+                  <YoutubePlayer
+                    height={200}
+                    play={false}
+                    videoId={song.video_id}
+                  />
+                </View>
+              ) : null}
             </View>
           ))}
         </View>
@@ -120,5 +130,14 @@ const styles = StyleSheet.create({
     fontSize: 14,
     marginTop: 4,
     opacity: 0.7,
+  },
+  youtubeContainer: {
+    width: '100%',
+    aspectRatio: 16 / 9,
+    marginTop: 12,
+    marginBottom: 4,
+    borderRadius: 8,
+    overflow: 'hidden',
+    backgroundColor: '#000',
   },
 });
