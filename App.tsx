@@ -11,7 +11,6 @@ import SongsTabView from './views/bottomtabs/SongsTabView';
 import CommunityTabView from './views/bottomtabs/CommunityTabView';
 import ProfileTabView from './views/bottomtabs/ProfileTabView';
 import AppColor from './services/styles/AppColor';
-import MusicSheet from './components/songs_components/MusicSheet';
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -64,7 +63,6 @@ export default function App() {
         ) : (
           <>
             <Stack.Screen name="Main" component={MainTabs} />
-            <Stack.Screen name="MusicSheet" component={MusicSheet} />
           </>
         )}
       </Stack.Navigator>

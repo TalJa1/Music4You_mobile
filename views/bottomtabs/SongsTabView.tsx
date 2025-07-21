@@ -12,25 +12,17 @@ import {
 } from 'react-native';
 import YoutubePlayer from 'react-native-youtube-iframe';
 import React, { useEffect, useState } from 'react';
+import { WebView } from 'react-native-webview';
 import AppColor from '../../services/styles/AppColor';
 import { getSongs } from '../../apis/bottomtabs_api/song_api';
 import { SongInterface } from '../../services/models/API_Models';
-import { useNavigation } from '@react-navigation/native';
-import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
-
-// Replace this with your actual navigator's param list
-type RootStackParamList = {
-  MusicSheet: { sheet_url: string };
-  // ...other routes
-};
 
 const SongsTabView = () => {
-  const navigation =
-    useNavigation<NativeStackNavigationProp<RootStackParamList>>();
   const [songs, setSongs] = useState<SongInterface[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const [refreshing, setRefreshing] = useState<boolean>(false);
+  const [openSheetId, setOpenSheetId] = useState<number | null>(null);
 
   const fetchSongs = async (showLoading = true) => {
     if (showLoading) setLoading(true);
@@ -97,8 +89,8 @@ const SongsTabView = () => {
                     <TouchableOpacity
                       style={styles.sheetIconBtn}
                       activeOpacity={0.7}
-                    onPress={() => {
-                        navigation.navigate('MusicSheet', { sheet_url: song.sheet_url });
+                      onPress={() => {
+                        setOpenSheetId(openSheetId === song.id ? null : song.id);
                       }}
                     >
                       <Text style={styles.sheetIcon}>🎼</Text>
@@ -118,6 +110,15 @@ const SongsTabView = () => {
                     />
                   </View>
                 ) : null}
+                {openSheetId === song.id && song.sheet_url && (
+                  <View style={{ display: 'none' }}>
+                    <WebView
+                      source={{ uri: song.sheet_url }}
+                      style={{ flex: 1 }}
+                      startInLoadingState={true}
+                    />
+                  </View>
+                )}
               </View>
             ))}
         </View>
