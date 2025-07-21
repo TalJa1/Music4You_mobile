@@ -12,6 +12,7 @@ import {
 } from 'react-native';
 import YoutubePlayer from 'react-native-youtube-iframe';
 import React, { useEffect, useState } from 'react';
+import { useRoute } from '@react-navigation/native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import { useNavigation } from '@react-navigation/native';
 import { WebView } from 'react-native-webview';
@@ -25,6 +26,7 @@ type RootStackParamList = {
 };
 
 const SongsTabView = () => {
+  const route = useRoute();
   const navigation = useNavigation<import('@react-navigation/native-stack').NativeStackNavigationProp<RootStackParamList>>();
   const [songs, setSongs] = useState<SongInterface[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
@@ -50,6 +52,13 @@ const SongsTabView = () => {
   useEffect(() => {
     fetchSongs();
   }, []);
+
+  useEffect(() => {
+    // If navigated with reload param, reload songs
+    if (route?.params && (route.params as any).reload) {
+      fetchSongs();
+    }
+  }, [route?.params]);
 
   const onRefresh = async () => {
     setRefreshing(true);

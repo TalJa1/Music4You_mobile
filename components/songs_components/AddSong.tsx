@@ -1,10 +1,12 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useState } from 'react';
+import { useNavigation } from '@react-navigation/native';
 import { View, Text, StyleSheet, TextInput, TouchableOpacity, Alert } from 'react-native';
 import { Picker } from '@react-native-picker/picker';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import AppColor from '../../services/styles/AppColor';
 import { createSong } from '../../apis/bottomtabs_api/song_api';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 
 const levels = [
   { label: 'Basic', value: 'basic' },
@@ -13,7 +15,15 @@ const levels = [
   { label: 'Extreme Hard', value: 'extreme hard' },
 ];
 
+
+type RootStackParamList = {
+  Songs: { reload: boolean } | undefined;
+  AddSong: undefined;
+  // add other screens if needed
+};
+
 const AddSong = () => {
+  const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
   const [title, setTitle] = useState('');
   const [artist, setArtist] = useState('');
   const [level, setLevel] = useState('basic');
@@ -49,6 +59,8 @@ const AddSong = () => {
       setLevel('basic');
       setSheetUrl('');
       setVideoId('');
+      // Go back to Songs tab and trigger reload
+      navigation.navigate('Songs', { reload: true });
     } catch (error) {
       Alert.alert('Error', 'Failed to add song. Please try again.');
     }
@@ -59,6 +71,13 @@ const AddSong = () => {
 
   return (
     <View style={styles.container}>
+      <TouchableOpacity
+        style={styles.backBtn}
+        activeOpacity={0.7}
+        onPress={() => navigation.goBack()}
+      >
+        <Icon name="arrow-back" size={24} color={AppColor.buttonText} />
+      </TouchableOpacity>
       <Text style={styles.title}>Add Song</Text>
       <TextInput
         style={styles.input}
@@ -127,6 +146,17 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: AppColor.text,
     marginBottom: 24,
+    alignSelf: 'center',
+    marginTop: 24,
+  },
+  backBtn: {
+    position: 'absolute',
+    top: 16,
+    left: 16,
+    zIndex: 10,
+    padding: 6,
+    borderRadius: 20,
+    backgroundColor: AppColor.primary,
   },
   input: {
     width: '100%',
