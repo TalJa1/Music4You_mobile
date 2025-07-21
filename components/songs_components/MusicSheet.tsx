@@ -1,15 +1,30 @@
-import { StyleSheet, Text, View, SafeAreaView, ScrollView } from 'react-native';
+import { StyleSheet, Text, View, SafeAreaView } from 'react-native';
+import { WebView } from 'react-native-webview';
 import AppColor from '../../services/styles/AppColor';
-import React from 'react';
+import React, { useEffect } from 'react';
+import { useRoute } from '@react-navigation/native';
+
+type MusicSheetRouteParams = {
+  sheet_url?: string;
+};
 
 const MusicSheet = () => {
+  const route = useRoute();
+  const { sheet_url } = (route.params as MusicSheetRouteParams) || {};
+
+  useEffect(() => {
+    console.log('sheet_url:', sheet_url);
+  }, [sheet_url]);
+
   return (
     <SafeAreaView style={styles.safeArea}>
-      <ScrollView contentContainerStyle={styles.scrollViewContent}>
-        <View style={styles.container}>
-          <Text style={styles.title}>MusicSheet</Text>
-        </View>
-      </ScrollView>
+      <View style={styles.container}>
+        <Text style={styles.title}>MusicSheet</Text>
+        <WebView
+          source={{ uri: sheet_url || 'https://www.free-scores.com/PDF/chopin-fra-ric-chopin-op009-nocturnos-81865.pdf' }}
+          style={styles.pdf}
+        />
+      </View>
     </SafeAreaView>
   );
 };
@@ -21,8 +36,13 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: AppColor.background,
   },
-  scrollViewContent: {
-    flexGrow: 1,
+  pdf: {
+    flex: 1,
+    width: '100%',
+    minHeight: 400,
+    backgroundColor: AppColor.background,
+    borderRadius: 8,
+    marginTop: 16,
   },
   container: {
     flex: 1,

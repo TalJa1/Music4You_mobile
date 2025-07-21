@@ -20,7 +20,7 @@ import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 
 // Replace this with your actual navigator's param list
 type RootStackParamList = {
-  MusicSheet: undefined;
+  MusicSheet: { sheet_url: string };
   // ...other routes
 };
 
@@ -97,8 +97,8 @@ const SongsTabView = () => {
                     <TouchableOpacity
                       style={styles.sheetIconBtn}
                       activeOpacity={0.7}
-                      onPress={() => {
-                        navigation.navigate('MusicSheet');
+                    onPress={() => {
+                        navigation.navigate('MusicSheet', { sheet_url: song.sheet_url });
                       }}
                     >
                       <Text style={styles.sheetIcon}>🎼</Text>
