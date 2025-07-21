@@ -12,6 +12,7 @@ import CommunityTabView from './views/bottomtabs/CommunityTabView';
 import ProfileTabView from './views/bottomtabs/ProfileTabView';
 import AppColor from './services/styles/AppColor';
 import AddSong from './components/songs_components/AddSong';
+import ChatTabView from './views/bottomtabs/ChatTabView';
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -22,6 +23,10 @@ const getTabBarIcon = (routeName: string) => {
     iconName = 'book-open-variant';
   } else if (routeName === 'Songs') {
     iconName = 'music-note';
+  } else if (routeName === 'Songs') {
+    iconName = 'music-note';
+  } else if (routeName === 'Chat') {
+    iconName = 'chat-processing';
   } else if (routeName === 'Community') {
     iconName = 'account-group';
   } else if (routeName === 'Profile') {
@@ -44,6 +49,7 @@ function MainTabs() {
     >
       <Tab.Screen name="Learn" component={LearnTabView} />
       <Tab.Screen name="Songs" component={SongsTabView} />
+      <Tab.Screen name="Chat" component={ChatTabView} />
       <Tab.Screen name="Community" component={CommunityTabView} />
       <Tab.Screen name="Profile" component={ProfileTabView} />
     </Tab.Navigator>
@@ -64,7 +70,11 @@ export default function App() {
         ) : (
           <>
             <Stack.Screen name="Main" component={MainTabs} />
-            <Stack.Screen name="AddSong" component={AddSong} options={{ title: 'Add Song' }} />
+            <Stack.Screen
+              name="AddSong"
+              component={AddSong}
+              options={{ title: 'Add Song' }}
+            />
           </>
         )}
       </Stack.Navigator>
