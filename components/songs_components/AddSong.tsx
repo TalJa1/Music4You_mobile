@@ -1,7 +1,7 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useState } from 'react';
 import { useNavigation } from '@react-navigation/native';
-import { View, Text, StyleSheet, TextInput, TouchableOpacity, Alert } from 'react-native';
+import { View, Text, StyleSheet, TextInput, TouchableOpacity, Alert, SafeAreaView, StatusBar, ScrollView } from 'react-native';
 import { Picker } from '@react-native-picker/picker';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import AppColor from '../../services/styles/AppColor';
@@ -69,70 +69,83 @@ const AddSong = () => {
     !title.trim() || !artist.trim() || !level.trim() || !sheetUrl.trim();
 
   return (
-    <View style={styles.container}>
-      <TouchableOpacity
-        style={styles.backBtn}
-        activeOpacity={0.7}
-        onPress={() => navigation.goBack()}
-      >
-        <Icon name="arrow-back" size={24} color={AppColor.buttonText} />
-      </TouchableOpacity>
-      <Text style={styles.title}>Add Song</Text>
-      <TextInput
-        style={styles.input}
-        placeholder="Title"
-        placeholderTextColor={AppColor.textSecondary}
-        value={title}
-        onChangeText={setTitle}
-      />
-      <TextInput
-        style={styles.input}
-        placeholder="Artist"
-        placeholderTextColor={AppColor.textSecondary}
-        value={artist}
-        onChangeText={setArtist}
-      />
-      <View style={styles.pickerContainer}>
-        <Picker
-          selectedValue={level}
-          onValueChange={setLevel}
-          style={styles.picker}
-          dropdownIconColor={AppColor.text}
-        >
-          {levels.map(l => (
-            <Picker.Item key={l.value} label={l.label} value={l.value} />
-          ))}
-        </Picker>
-      </View>
-      <TextInput
-        style={styles.input}
-        placeholder="Sheet URL"
-        placeholderTextColor={AppColor.textSecondary}
-        value={sheetUrl}
-        onChangeText={setSheetUrl}
-      />
-      <TextInput
-        style={styles.input}
-        placeholder="YouTube Video ID"
-        placeholderTextColor={AppColor.textSecondary}
-        value={videoId}
-        onChangeText={text => setVideoId(extractYouTubeId(text))}
-      />
-      <TouchableOpacity
-        style={[styles.button, isDisabled && styles.buttonDisabled]}
-        onPress={handleAddSong}
-        disabled={isDisabled}
-      >
-        <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}>
-          <Icon name="add-circle" size={22} color={isDisabled ? AppColor.textSecondary : AppColor.buttonText} style={{ marginRight: 8 }} />
-          <Text style={styles.buttonText}>Add Song</Text>
+    <SafeAreaView style={styles.safeArea}>
+      <StatusBar backgroundColor={AppColor.background} barStyle="dark-content" />
+      <ScrollView contentContainerStyle={styles.scrollContent} keyboardShouldPersistTaps="handled">
+        <View style={styles.container}>
+          <TouchableOpacity
+            style={styles.backBtn}
+            activeOpacity={0.7}
+            onPress={() => navigation.goBack()}
+          >
+            <Icon name="arrow-back" size={24} color={AppColor.buttonText} />
+          </TouchableOpacity>
+          <Text style={styles.title}>Add Song</Text>
+          <TextInput
+            style={styles.input}
+            placeholder="Title"
+            placeholderTextColor={AppColor.textSecondary}
+            value={title}
+            onChangeText={setTitle}
+          />
+          <TextInput
+            style={styles.input}
+            placeholder="Artist"
+            placeholderTextColor={AppColor.textSecondary}
+            value={artist}
+            onChangeText={setArtist}
+          />
+          <View style={styles.pickerContainer}>
+            <Picker
+              selectedValue={level}
+              onValueChange={setLevel}
+              style={styles.picker}
+              dropdownIconColor={AppColor.text}
+            >
+              {levels.map(l => (
+                <Picker.Item key={l.value} label={l.label} value={l.value} />
+              ))}
+            </Picker>
+          </View>
+          <TextInput
+            style={styles.input}
+            placeholder="Sheet URL"
+            placeholderTextColor={AppColor.textSecondary}
+            value={sheetUrl}
+            onChangeText={setSheetUrl}
+          />
+          <TextInput
+            style={styles.input}
+            placeholder="YouTube Video ID"
+            placeholderTextColor={AppColor.textSecondary}
+            value={videoId}
+            onChangeText={text => setVideoId(extractYouTubeId(text))}
+          />
+          <TouchableOpacity
+            style={[styles.button, isDisabled && styles.buttonDisabled]}
+            onPress={handleAddSong}
+            disabled={isDisabled}
+          >
+            <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}>
+              <Icon name="add-circle" size={22} color={isDisabled ? AppColor.textSecondary : AppColor.buttonText} style={{ marginRight: 8 }} />
+              <Text style={styles.buttonText}>Add Song</Text>
+            </View>
+          </TouchableOpacity>
         </View>
-      </TouchableOpacity>
-    </View>
+      </ScrollView>
+    </SafeAreaView>
   );
 };
 
 const styles = StyleSheet.create({
+  safeArea: {
+    flex: 1,
+    backgroundColor: AppColor.background,
+  },
+  scrollContent: {
+    flexGrow: 1,
+    paddingBottom: 24,
+  },
   container: {
     flex: 1,
     backgroundColor: AppColor.background,
