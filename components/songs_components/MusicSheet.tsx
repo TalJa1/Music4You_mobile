@@ -1,8 +1,16 @@
-import { StyleSheet, Text, View, SafeAreaView } from 'react-native';
+/* eslint-disable react-native/no-inline-styles */
+import {
+  StyleSheet,
+  Text,
+  View,
+  SafeAreaView,
+  TouchableOpacity,
+} from 'react-native';
+import Icon from 'react-native-vector-icons/MaterialIcons';
 import { WebView } from 'react-native-webview';
 import AppColor from '../../services/styles/AppColor';
 import React, { useEffect } from 'react';
-import { useRoute } from '@react-navigation/native';
+import { useRoute, useNavigation } from '@react-navigation/native';
 
 type MusicSheetRouteParams = {
   sheet_url?: string;
@@ -10,6 +18,7 @@ type MusicSheetRouteParams = {
 
 const MusicSheet = () => {
   const route = useRoute();
+  const navigation = useNavigation();
   const { sheet_url } = (route.params as MusicSheetRouteParams) || {};
 
   useEffect(() => {
@@ -19,9 +28,27 @@ const MusicSheet = () => {
   return (
     <SafeAreaView style={styles.safeArea}>
       <View style={styles.container}>
-        <Text style={styles.title}>MusicSheet</Text>
+        <View style={styles.headerRow}>
+          <TouchableOpacity
+            style={styles.iconBtn}
+            onPress={() => navigation.goBack()}
+          >
+            <Icon
+              name="arrow-back"
+              size={28}
+              color={AppColor.primary}
+              style={styles.icon}
+            />
+          </TouchableOpacity>
+          <Text style={styles.title}>MusicSheet</Text>
+          <View style={{ width: 28, height: 28 }} />
+        </View>
         <WebView
-          source={{ uri: sheet_url || 'https://www.free-scores.com/PDF/chopin-fra-ric-chopin-op009-nocturnos-81865.pdf' }}
+          source={{
+            uri:
+              sheet_url ||
+              'https://www.free-scores.com/PDF/chopin-fra-ric-chopin-op009-nocturnos-81865.pdf',
+          }}
           style={styles.pdf}
         />
       </View>
@@ -60,5 +87,25 @@ const styles = StyleSheet.create({
     fontSize: 24,
     fontWeight: 'bold',
     marginBottom: 8,
+  },
+  headerRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 12,
+    width: '100%',
+    justifyContent: 'space-between',
+  },
+  iconBtn: {
+    padding: 6,
+    borderRadius: 20,
+    backgroundColor: AppColor.card,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginRight: 8,
+  },
+  icon: {
+    fontSize: 22,
+    color: AppColor.primary,
+    fontWeight: 'bold',
   },
 });
