@@ -12,12 +12,20 @@ import {
 } from 'react-native';
 import YoutubePlayer from 'react-native-youtube-iframe';
 import React, { useEffect, useState } from 'react';
+import Icon from 'react-native-vector-icons/MaterialIcons';
+import { useNavigation } from '@react-navigation/native';
 import { WebView } from 'react-native-webview';
 import AppColor from '../../services/styles/AppColor';
 import { getSongs } from '../../apis/bottomtabs_api/song_api';
 import { SongInterface } from '../../services/models/API_Models';
 
+type RootStackParamList = {
+  AddSong: undefined;
+  // ...other routes
+};
+
 const SongsTabView = () => {
+  const navigation = useNavigation<import('@react-navigation/native-stack').NativeStackNavigationProp<RootStackParamList>>();
   const [songs, setSongs] = useState<SongInterface[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
@@ -67,7 +75,16 @@ const SongsTabView = () => {
         }
       >
         <View style={styles.container}>
-          <Text style={styles.text}>Songs</Text>
+          <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', width: '100%', marginBottom: 10 }}>
+            <Text style={styles.text}>Songs</Text>
+            <TouchableOpacity
+              style={{ padding: 6, borderRadius: 20, backgroundColor: AppColor.primary, marginLeft: 8 }}
+              activeOpacity={0.7}
+              onPress={() => navigation.navigate('AddSong')}
+            >
+              <Icon name="add" size={24} color={AppColor.buttonText} />
+            </TouchableOpacity>
+          </View>
           {loading && (
             <ActivityIndicator
               size="large"

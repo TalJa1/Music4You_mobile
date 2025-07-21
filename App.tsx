@@ -11,6 +11,7 @@ import SongsTabView from './views/bottomtabs/SongsTabView';
 import CommunityTabView from './views/bottomtabs/CommunityTabView';
 import ProfileTabView from './views/bottomtabs/ProfileTabView';
 import AppColor from './services/styles/AppColor';
+import AddSong from './components/songs_components/AddSong';
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -63,6 +64,7 @@ export default function App() {
         ) : (
           <>
             <Stack.Screen name="Main" component={MainTabs} />
+            <Stack.Screen name="AddSong" component={AddSong} options={{ title: 'Add Song' }} />
           </>
         )}
       </Stack.Navigator>
