@@ -59,8 +59,7 @@ const AddSong = () => {
       setLevel('basic');
       setSheetUrl('');
       setVideoId('');
-      // Go back to Songs tab and trigger reload
-      navigation.navigate('Songs', { reload: true });
+      navigation.goBack();
     } catch (error) {
       Alert.alert('Error', 'Failed to add song. Please try again.');
     }

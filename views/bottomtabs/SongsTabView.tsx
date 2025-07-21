@@ -11,8 +11,8 @@ import {
   TouchableOpacity,
 } from 'react-native';
 import YoutubePlayer from 'react-native-youtube-iframe';
-import React, { useEffect, useState } from 'react';
-import { useRoute } from '@react-navigation/native';
+import React, { useState } from 'react';
+import { useFocusEffect } from '@react-navigation/native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import { useNavigation } from '@react-navigation/native';
 import { WebView } from 'react-native-webview';
@@ -26,8 +26,10 @@ type RootStackParamList = {
 };
 
 const SongsTabView = () => {
-  const route = useRoute();
-  const navigation = useNavigation<import('@react-navigation/native-stack').NativeStackNavigationProp<RootStackParamList>>();
+  const navigation =
+    useNavigation<
+      import('@react-navigation/native-stack').NativeStackNavigationProp<RootStackParamList>
+    >();
   const [songs, setSongs] = useState<SongInterface[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
@@ -49,16 +51,11 @@ const SongsTabView = () => {
     }
   };
 
-  useEffect(() => {
-    fetchSongs();
-  }, []);
-
-  useEffect(() => {
-    // If navigated with reload param, reload songs
-    if (route?.params && (route.params as any).reload) {
+  useFocusEffect(
+    React.useCallback(() => {
       fetchSongs();
-    }
-  }, [route?.params]);
+    }, []),
+  );
 
   const onRefresh = async () => {
     setRefreshing(true);
@@ -84,10 +81,23 @@ const SongsTabView = () => {
         }
       >
         <View style={styles.container}>
-          <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', width: '100%', marginBottom: 10 }}>
+          <View
+            style={{
+              flexDirection: 'row',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              width: '100%',
+              marginBottom: 10,
+            }}
+          >
             <Text style={styles.text}>Songs</Text>
             <TouchableOpacity
-              style={{ padding: 6, borderRadius: 20, backgroundColor: AppColor.primary, marginLeft: 8 }}
+              style={{
+                padding: 6,
+                borderRadius: 20,
+                backgroundColor: AppColor.primary,
+                marginLeft: 8,
+              }}
               activeOpacity={0.7}
               onPress={() => navigation.navigate('AddSong')}
             >
@@ -116,7 +126,9 @@ const SongsTabView = () => {
                       style={styles.sheetIconBtn}
                       activeOpacity={0.7}
                       onPress={() => {
-                        setOpenSheetId(openSheetId === song.id ? null : song.id);
+                        setOpenSheetId(
+                          openSheetId === song.id ? null : song.id,
+                        );
                       }}
                     >
                       <Text style={styles.sheetIcon}>🎼</Text>
