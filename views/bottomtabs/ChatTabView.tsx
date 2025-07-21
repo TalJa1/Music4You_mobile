@@ -11,16 +11,47 @@ const ChatTabView = () => {
   const [input, setInput] = useState('');
   const scrollViewRef = useRef<ScrollView>(null);
 
-  const handleSend = () => {
+  const handleSend = async () => {
     if (!input.trim()) return;
     const userMsg = { sender: 'user', text: input.trim() };
     setMessages(prev => [...prev, userMsg]);
     setInput('');
-    setTimeout(() => {
-      setMessages(prev => [...prev, { sender: 'bot', text: 'This is a placeholder response. (Connect to AI API for real answers!)' }]);
-      scrollViewRef.current?.scrollToEnd({ animated: true });
-    }, 800);
+    setMessages(prev => [...prev, { sender: 'bot', text: 'Thinking...' }]);
     scrollViewRef.current?.scrollToEnd({ animated: true });
+
+    try {
+      const response = await fetch('https://api.lenguyenbaolong.art/api/v1/chats_openai/07e10f265e6411f0ae912ec3e04057e5/chat/completions', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer ragflow-Y3YzI5M2Q0MjdlZjExZjBiMDBkNzZlNT',
+        },
+        body: JSON.stringify({
+          model: 'deepseek-chat@DeepSeek',
+          messages: [{ role: 'user', content: userMsg.text }],
+          max_tokens: 2048,
+          stream: false,
+        }),
+      });
+      const data = await response.json();
+      let botReply = 'No response.';
+      if (data && data.choices && data.choices[0] && data.choices[0].message && data.choices[0].message.content) {
+        botReply = data.choices[0].message.content;
+      }
+      setMessages(prev => {
+        // Remove the loading message and add the real reply
+        const msgs = prev.slice(0, -1);
+        return [...msgs, { sender: 'bot', text: botReply }];
+      });
+      scrollViewRef.current?.scrollToEnd({ animated: true });
+    } catch (err) {
+      setMessages(prev => {
+        // Remove the loading message and add error
+        const msgs = prev.slice(0, -1);
+        return [...msgs, { sender: 'bot', text: 'An error occurred while calling the API.' }];
+      });
+      scrollViewRef.current?.scrollToEnd({ animated: true });
+    }
   };
 
   return (
