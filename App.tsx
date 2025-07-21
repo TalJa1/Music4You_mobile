@@ -11,10 +11,10 @@ import SongsTabView from './views/bottomtabs/SongsTabView';
 import CommunityTabView from './views/bottomtabs/CommunityTabView';
 import ProfileTabView from './views/bottomtabs/ProfileTabView';
 import AppColor from './services/styles/AppColor';
+import MusicSheet from './components/songs_components/MusicSheet';
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
-
 
 const getTabBarIcon = (routeName: string) => {
   let iconName = '';
@@ -62,7 +62,10 @@ export default function App() {
             {() => <LoginView onLogin={() => setIsLoggedIn(true)} />}
           </Stack.Screen>
         ) : (
-          <Stack.Screen name="Main" component={MainTabs} />
+          <>
+            <Stack.Screen name="Main" component={MainTabs} />
+            <Stack.Screen name="MusicSheet" component={MusicSheet} />
+          </>
         )}
       </Stack.Navigator>
     </NavigationContainer>

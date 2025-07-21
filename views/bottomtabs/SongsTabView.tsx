@@ -1,25 +1,42 @@
 /* eslint-disable react-native/no-inline-styles */
-import { StyleSheet, Text, View, SafeAreaView, StatusBar, ScrollView, ActivityIndicator, RefreshControl, TouchableOpacity } from 'react-native';
+import {
+  StyleSheet,
+  Text,
+  View,
+  SafeAreaView,
+  StatusBar,
+  ScrollView,
+  ActivityIndicator,
+  RefreshControl,
+  TouchableOpacity,
+} from 'react-native';
 import YoutubePlayer from 'react-native-youtube-iframe';
 import React, { useEffect, useState } from 'react';
 import AppColor from '../../services/styles/AppColor';
 import { getSongs } from '../../apis/bottomtabs_api/song_api';
 import { SongInterface } from '../../services/models/API_Models';
+import { useNavigation } from '@react-navigation/native';
+import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 
-
+// Replace this with your actual navigator's param list
+type RootStackParamList = {
+  MusicSheet: undefined;
+  // ...other routes
+};
 
 const SongsTabView = () => {
+  const navigation =
+    useNavigation<NativeStackNavigationProp<RootStackParamList>>();
   const [songs, setSongs] = useState<SongInterface[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const [refreshing, setRefreshing] = useState<boolean>(false);
 
-
   const fetchSongs = async (showLoading = true) => {
     if (showLoading) setLoading(true);
     try {
       const data = await getSongs();
-      
+
       setSongs(data);
       setError(null);
     } catch (err) {
@@ -42,7 +59,10 @@ const SongsTabView = () => {
 
   return (
     <SafeAreaView style={styles.safeArea}>
-      <StatusBar backgroundColor={AppColor.background} barStyle="light-content" />
+      <StatusBar
+        backgroundColor={AppColor.background}
+        barStyle="light-content"
+      />
       <ScrollView
         contentContainerStyle={styles.scrollContent}
         refreshControl={
@@ -56,36 +76,50 @@ const SongsTabView = () => {
       >
         <View style={styles.container}>
           <Text style={styles.text}>Songs</Text>
-          {loading && <ActivityIndicator size="large" color={AppColor.text} style={{ marginTop: 20 }} />}
+          {loading && (
+            <ActivityIndicator
+              size="large"
+              color={AppColor.text}
+              style={{ marginTop: 20 }}
+            />
+          )}
           {error && <Text style={styles.error}>{error}</Text>}
           {!loading && !error && songs.length === 0 && (
             <Text style={styles.empty}>No songs found.</Text>
           )}
-          {!loading && !error && songs.map(song => (
-            <View key={song.id} style={styles.songCard}>
-              <View style={styles.cardHeader}>
-                <View style={styles.titleRow}>
-                  <Text style={styles.songTitle}>{song.title}</Text>
-                  <TouchableOpacity style={styles.sheetIconBtn} activeOpacity={0.7} onPress={() => { /* show sheet feature later */ }}>
-                    <Text style={styles.sheetIcon}>🎼</Text>
-                  </TouchableOpacity>
+          {!loading &&
+            !error &&
+            songs.map(song => (
+              <View key={song.id} style={styles.songCard}>
+                <View style={styles.cardHeader}>
+                  <View style={styles.titleRow}>
+                    <Text style={styles.songTitle}>{song.title}</Text>
+                    <TouchableOpacity
+                      style={styles.sheetIconBtn}
+                      activeOpacity={0.7}
+                      onPress={() => {
+                        navigation.navigate('MusicSheet');
+                      }}
+                    >
+                      <Text style={styles.sheetIcon}>🎼</Text>
+                    </TouchableOpacity>
+                  </View>
+                  <Text style={styles.songArtist}>{song.artist}</Text>
+                  <View style={styles.levelBadge}>
+                    <Text style={styles.levelText}>{song.level}</Text>
+                  </View>
                 </View>
-                <Text style={styles.songArtist}>{song.artist}</Text>
-                <View style={styles.levelBadge}>
-                  <Text style={styles.levelText}>{song.level}</Text>
-                </View>
+                {song.video_id ? (
+                  <View style={styles.youtubeContainer}>
+                    <YoutubePlayer
+                      height={200}
+                      play={false}
+                      videoId={song.video_id}
+                    />
+                  </View>
+                ) : null}
               </View>
-              {song.video_id ? (
-                <View style={styles.youtubeContainer}>
-                  <YoutubePlayer
-                    height={200}
-                    play={false}
-                    videoId={song.video_id}
-                  />
-                </View>
-              ) : null}
-            </View>
-          ))}
+            ))}
         </View>
       </ScrollView>
     </SafeAreaView>
