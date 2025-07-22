@@ -1,5 +1,6 @@
 /* eslint-disable react-native/no-inline-styles */
 import { StyleSheet, Text, View, TextInput, TouchableOpacity, ScrollView, KeyboardAvoidingView, Platform, SafeAreaView, StatusBar } from 'react-native';
+import Markdown from 'react-native-markdown-display';
 import React, { useState, useRef } from 'react';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import AppColor from '../../services/styles/AppColor';
@@ -66,7 +67,31 @@ const ChatTabView = () => {
         >
           {messages.map((msg, idx) => (
             <View key={idx} style={[styles.message, msg.sender === 'user' ? styles.userMsg : styles.botMsg]}>
-              <Text style={msg.sender === 'user' ? styles.userText : styles.botText}>{msg.text}</Text>
+              {msg.sender === 'user' ? (
+                <Text style={styles.userText}>{msg.text}</Text>
+              ) : (
+                <Markdown
+                  style={{
+                    body: styles.botText,
+                    code_inline: {
+                      color: '#333',
+                      backgroundColor: '#f5f5f5',
+                      fontSize: 16,
+                      borderRadius: 4,
+                      padding: 2,
+                    },
+                    code_block: {
+                      color: '#333',
+                      backgroundColor: '#f5f5f5',
+                      fontSize: 16,
+                      borderRadius: 4,
+                      padding: 8,
+                    },
+                  }}
+                >
+                  {msg.text}
+                </Markdown>
+              )}
             </View>
           ))}
         </ScrollView>
