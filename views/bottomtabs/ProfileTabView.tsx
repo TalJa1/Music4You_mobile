@@ -4,42 +4,58 @@ import React, { useEffect, useState } from 'react';
 import AppColor from '../../services/styles/AppColor';
 import { GoogleSignin } from '@react-native-google-signin/google-signin';
 import { getUserByEmail } from '../../apis/login/login_api';
-import { UserInterface } from '../../services/models/API_Models';
+import { getUserProgressByUserId } from '../../apis/bottomtabs_api/progress_api';
+import { UserInterface, ProgressInterfaceArray } from '../../services/models/API_Models';
 
 
 
 const ProfileTabView = () => {
   const [user, setUser] = useState<UserInterface | null>(null);
+  const [progress, setProgress] = useState<ProgressInterfaceArray>([]);
 
   useEffect(() => {
     // Try to get current Google user info, then fetch user from DB by email
-    const fetchUser = async () => {
+    const fetchUserAndProgress = async () => {
       try {
         const currentUser = await GoogleSignin.getCurrentUser();
         const email = currentUser?.user?.email;
         if (email) {
           const dbUser = await getUserByEmail(email);
           setUser(dbUser);
+          if (dbUser?.id) {
+            const userProgress = await getUserProgressByUserId(dbUser.id);
+            setProgress(userProgress);
+          } else {
+            setProgress([]);
+          }
         } else {
           setUser(null);
+          setProgress([]);
         }
       } catch (e) {
         setUser(null);
+        setProgress([]);
       }
     };
-    fetchUser();
+    fetchUserAndProgress();
   }, []);
 
-  // Dummy data for features
   const currentCourse = {
-    title: 'React Native for Beginners',
-    progress: 0.6,
+    title: 'Course progress',
+    progress:
+      progress.length > 0
+        ? progress.filter(p => p.completed).length / progress.length
+        : 0,
   };
-  const achievements = [
-    { id: 1, label: '7-Day Streak', icon: 'fire' },
-    { id: 2, label: 'First Song Uploaded', icon: 'music' },
-    { id: 3, label: 'Profile Completed', icon: 'account-check' },
+  const allAchievements = [
+    { id: 1, label: 'Profile Completed', icon: 'account-check' },
+    { id: 2, label: 'First Song Uploaded/Learned', icon: 'music' },
+    { id: 3, label: '7-Day Streak', icon: 'fire' },
   ];
+  const achievements =
+    currentCourse.progress > 0
+      ? allAchievements
+      : [allAchievements[0]];
   const reminders = [
     { id: 1, text: 'Practice guitar for 30 minutes today' },
     { id: 2, text: 'Complete lesson 3 in React Native course' },
