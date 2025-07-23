@@ -6,6 +6,7 @@ import {
   StatusBar,
   ScrollView,
   Linking,
+  RefreshControl,
 } from 'react-native';
 import { WebView } from 'react-native-webview';
 import React, { useState, useEffect } from 'react';
@@ -20,21 +21,29 @@ const LearnTabView = () => {
   );
   const [lessons, setLessons] = useState<LessonInterfaceArray>([]);
   const [loading, setLoading] = useState(false);
+  const [refreshing, setRefreshing] = useState(false);
+
+  const fetchLessons = async (showLoading = true) => {
+    if (showLoading) setLoading(true);
+    try {
+      const data = await getLessons();
+      setLessons(data);
+    } catch (e) {
+      setLessons([]);
+    } finally {
+      if (showLoading) setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    const fetchLessons = async () => {
-      setLoading(true);
-      try {
-        const data = await getLessons();
-        setLessons(data);
-      } catch (e) {
-        setLessons([]);
-      } finally {
-        setLoading(false);
-      }
-    };
     fetchLessons();
   }, []);
+
+  const onRefresh = async () => {
+    setRefreshing(true);
+    await fetchLessons(false);
+    setRefreshing(false);
+  };
 
   return (
     <SafeAreaView style={styles.safeArea}>
@@ -42,7 +51,12 @@ const LearnTabView = () => {
         backgroundColor={AppColor.background}
         barStyle="light-content"
       />
-      <ScrollView contentContainerStyle={styles.scrollContent}>
+      <ScrollView
+        contentContainerStyle={styles.scrollContent}
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+        }
+      >
         <View style={styles.centerRow}>
           <Text style={styles.appTitle}>
             <Text style={styles.bold}>Music</Text>
