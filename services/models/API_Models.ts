@@ -26,3 +26,14 @@ export interface ProgressInterface {
   completed_at: string
   id: number
 }
+
+export type LessonInterfaceArray = LessonInterface[]
+
+export interface LessonInterface {
+  title: string
+  description: string
+  level: string
+  media_id: string
+  type: string
+  id: number
+}
