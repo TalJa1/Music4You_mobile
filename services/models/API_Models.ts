@@ -16,3 +16,13 @@ export interface UserInterface {
   id: number
   created_at: string
 }
+
+export type ProgressInterfaceArray = ProgressInterface[]
+
+export interface ProgressInterface {
+  user_id: number
+  lesson_id: number
+  completed: boolean
+  completed_at: string
+  id: number
+}
