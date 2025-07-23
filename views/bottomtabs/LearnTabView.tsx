@@ -7,16 +7,23 @@ import {
   ScrollView,
   Linking,
   RefreshControl,
-  Alert,
+  Modal,
+  TouchableOpacity,
 } from 'react-native';
 import { WebView } from 'react-native-webview';
 
 import React, { useState, useEffect } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-import { LessonInterfaceArray } from '../../services/models/API_Models';
+import {
+  LessonInterfaceArray,
+  UserInterface,
+} from '../../services/models/API_Models';
 import { getLessons } from '../../apis/bottomtabs_api/lesson_api';
-import { getUserProgressByUserIdAndLessonId } from '../../apis/bottomtabs_api/progress_api';
+import {
+  getUserProgressByUserIdAndLessonId,
+  createUserProgress,
+} from '../../apis/bottomtabs_api/progress_api';
 import AppColor from '../../services/styles/AppColor';
 
 const LearnTabView = () => {
@@ -26,7 +33,21 @@ const LearnTabView = () => {
   const [lessons, setLessons] = useState<LessonInterfaceArray>([]);
   const [loading, setLoading] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
-  const [user, setUser] = useState<any>(null);
+  const [user, setUser] = useState<UserInterface>({
+    username: '',
+    email: '',
+    avatar_url: '',
+    id: 0,
+    created_at: '',
+  });
+
+  // Modal state
+  const [modalVisible, setModalVisible] = useState(false);
+  const [modalContent, setModalContent] = useState({
+    title: '',
+    message: '',
+    onProceed: undefined as undefined | (() => void),
+  });
 
   useEffect(() => {
     const loadUser = async () => {
@@ -36,35 +57,88 @@ const LearnTabView = () => {
           setUser(JSON.parse(userData));
         }
       } catch (e) {
-        setUser(null);
+        setUser({
+          username: '',
+          email: '',
+          avatar_url: '',
+          id: 0,
+          created_at: '',
+        });
       }
     };
     loadUser();
   }, []);
 
   const handleCheckProgressAndOpen = async (lesson: any) => {
-    if (!user) {
-      Alert.alert('User not found', 'Please log in again.');
-      return;
-    }
     try {
-      const progress = await getUserProgressByUserIdAndLessonId(
+      const progressRes = await getUserProgressByUserIdAndLessonId(
         user.id,
         lesson.id,
       );
-      if (progress && progress.length > 0) {
-        Alert.alert('Progress found', 'You have already started this lesson.');
+
+      if (progressRes) {
+        setModalContent({
+          title: 'Progress found',
+          message: 'You have already started this lesson.',
+          onProceed: () => {
+            if (lesson.lesson_link && lesson.lesson_link.trim() !== '') {
+              Linking.openURL(lesson.lesson_link);
+            }
+          },
+        });
       } else {
-        Alert.alert('No progress', 'You have not started this lesson yet.');
+        setModalContent({
+          title: 'No progress',
+          message: 'You have not started this lesson yet.',
+          onProceed: async () => {
+            try {
+              await createUserProgress({
+                user_id: user.id,
+                lesson_id: lesson.id,
+                completed: true,
+                completed_at: new Date().toISOString(),
+              });
+            } catch (err) {
+              // Optionally handle error (e.g., show a toast)
+            }
+            if (lesson.lesson_link && lesson.lesson_link.trim() !== '') {
+              Linking.openURL(lesson.lesson_link);
+            }
+          },
+        });
       }
+      setModalVisible(true);
     } catch (e: any) {
+      // If axios error, try to check if it's a 404 (no progress)
       if (e?.response?.status === 404) {
-        Alert.alert('No progress', 'You have not started this lesson yet.');
+        setModalContent({
+          title: 'No progress',
+          message: 'You have not started this lesson yet.',
+          onProceed: async () => {
+            try {
+              await createUserProgress({
+                user_id: user.id,
+                lesson_id: lesson.id,
+                completed: true,
+                completed_at: new Date().toISOString(),
+              });
+            } catch (err) {
+              // Optionally handle error (e.g., show a toast)
+            }
+            if (lesson.lesson_link && lesson.lesson_link.trim() !== '') {
+              Linking.openURL(lesson.lesson_link);
+            }
+          },
+        });
       } else {
-        Alert.alert('Error', 'Could not check progress.');
+        setModalContent({
+          title: 'Error',
+          message: `Could not check progress. ${e}`,
+          onProceed: undefined,
+        });
       }
+      setModalVisible(true);
     }
-    // Linking.openURL(lesson.lesson_link);
   };
 
   const fetchLessons = async (showLoading = true) => {
@@ -95,12 +169,57 @@ const LearnTabView = () => {
         backgroundColor={AppColor.background}
         barStyle="light-content"
       />
+      {/* Custom Modal */}
+      <Modal
+        visible={modalVisible}
+        transparent
+        animationType="fade"
+        onRequestClose={() => setModalVisible(false)}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContainer}>
+            <Text style={styles.modalTitle}>{modalContent.title}</Text>
+            <Text style={styles.modalMessage}>{modalContent.message}</Text>
+            <View style={styles.modalButtonRow}>
+              <TouchableOpacity
+                style={[styles.modalButton, { backgroundColor: AppColor.card }]}
+                onPress={() => setModalVisible(false)}
+              >
+                <Text style={styles.modalButtonText}>Cancel</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={[
+                  styles.modalButton,
+                  { backgroundColor: AppColor.accent },
+                ]}
+                onPress={() => {
+                  setModalVisible(false);
+                  setTimeout(() => {
+                    modalContent.onProceed && modalContent.onProceed();
+                  }, 200);
+                }}
+              >
+                <Text
+                  style={[
+                    styles.modalButtonText,
+                    { color: AppColor.background },
+                  ]}
+                >
+                  Proceed
+                </Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      </Modal>
+      {/* ...existing code... */}
       <ScrollView
         contentContainerStyle={styles.scrollContent}
         refreshControl={
           <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
         }
       >
+        {/* ...existing code... */}
         <View style={styles.centerRow}>
           <Text style={styles.appTitle}>
             <Text style={styles.bold}>Music</Text>
@@ -108,6 +227,7 @@ const LearnTabView = () => {
             <Text style={styles.bold}>You</Text>
           </Text>
         </View>
+        {/* ...existing code... */}
         <View style={styles.tabRow}>
           <Text
             style={selectedTab === 'theory' ? styles.tabActive : styles.tab}
@@ -122,6 +242,7 @@ const LearnTabView = () => {
             Practice
           </Text>
         </View>
+        {/* ...existing code... */}
         <View style={styles.tabContent}>
           {selectedTab === 'theory' ? (
             loading ? (
@@ -188,6 +309,53 @@ const LearnTabView = () => {
 export default LearnTabView;
 
 const styles = StyleSheet.create({
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.4)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  modalContainer: {
+    width: '80%',
+    backgroundColor: AppColor.background,
+    borderRadius: 16,
+    padding: 24,
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOpacity: 0.15,
+    shadowRadius: 8,
+    elevation: 5,
+  },
+  modalTitle: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    color: AppColor.accent,
+    marginBottom: 8,
+    textAlign: 'center',
+  },
+  modalMessage: {
+    fontSize: 16,
+    color: AppColor.text,
+    marginBottom: 20,
+    textAlign: 'center',
+  },
+  modalButtonRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    width: '100%',
+  },
+  modalButton: {
+    flex: 1,
+    marginHorizontal: 6,
+    paddingVertical: 10,
+    borderRadius: 8,
+    alignItems: 'center',
+  },
+  modalButtonText: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: AppColor.text,
+  },
   centerRow: {
     flexDirection: 'row',
     justifyContent: 'center',
