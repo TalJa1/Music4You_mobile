@@ -10,3 +10,12 @@ export const createUser = async (
 export const getUserById = async (id: number): Promise<UserInterface> => {
   return await axiosClient.get(`/users/${id}`);
 };
+
+export const getUserByEmail = async (
+  email: string | undefined,
+): Promise<UserInterface> => {
+  if (!email) {
+    throw new Error('Email is required');
+  }
+  return await axiosClient.get(`/users/by-email/${email}`);
+};

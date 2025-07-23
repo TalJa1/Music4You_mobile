@@ -1,10 +1,25 @@
 /* eslint-disable react-native/no-inline-styles */
 
-import { StyleSheet, Text, View, Alert, SafeAreaView, ScrollView, TextInput, TouchableOpacity, Pressable, StatusBar } from 'react-native';
+import {
+  StyleSheet,
+  Text,
+  View,
+  Alert,
+  SafeAreaView,
+  ScrollView,
+  TextInput,
+  TouchableOpacity,
+  Pressable,
+  StatusBar,
+} from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import React, { useEffect } from 'react';
-import { GoogleSignin, statusCodes } from '@react-native-google-signin/google-signin';
+import {
+  GoogleSignin,
+  statusCodes,
+} from '@react-native-google-signin/google-signin';
 import AppColor from '../services/styles/AppColor';
+import { getUserByEmail, createUser } from '../apis/login/login_api';
 
 type LoginViewProps = {
   onLogin: () => void;
@@ -24,8 +39,34 @@ const LoginView: React.FC<LoginViewProps> = ({ onLogin }) => {
     try {
       await GoogleSignin.hasPlayServices();
       const userInfo = await GoogleSignin.signIn();
-      console.log('User Info:', userInfo.data?.user.name);
-      onLogin();
+      const email = userInfo.data?.user.email;
+      console.log('User Email:', email);
+      let user = null;
+      try {
+        user = await getUserByEmail(email);
+      } catch (error: any) {
+        if (error?.response?.status !== 404) {
+          throw error;
+        }
+      }
+      if (user) {
+        onLogin();
+      } else {
+        try {
+          if (!email) throw new Error('No email found from Google account.');
+          await createUser({
+            username: email.split('@')[0],
+            email,
+            avatar_url: userInfo.data?.user.photo || '',
+          });
+          onLogin();
+        } catch (err: any) {
+          Alert.alert(
+            'Sign up failed',
+            err?.message || 'Could not create user.',
+          );
+        }
+      }
     } catch (error: any) {
       if (error.code === statusCodes.SIGN_IN_CANCELLED) {
         // user cancelled the login flow
@@ -42,7 +83,10 @@ const LoginView: React.FC<LoginViewProps> = ({ onLogin }) => {
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: AppColor.background }}>
       <StatusBar backgroundColor={AppColor.background} />
-      <ScrollView contentContainerStyle={{ flexGrow: 1 }} keyboardShouldPersistTaps="handled">
+      <ScrollView
+        contentContainerStyle={{ flexGrow: 1 }}
+        keyboardShouldPersistTaps="handled"
+      >
         <View style={styles.container}>
           <View style={styles.card}>
             <View style={styles.logoContainer}>
@@ -51,7 +95,9 @@ const LoginView: React.FC<LoginViewProps> = ({ onLogin }) => {
               </View>
               <Text style={styles.appTitle}>
                 <Text style={{ fontWeight: 'bold' }}>music</Text>
-                <Text style={{ fontWeight: 'bold', color: AppColor.accent }}>4</Text>
+                <Text style={{ fontWeight: 'bold', color: AppColor.accent }}>
+                  4
+                </Text>
                 <Text style={{ fontWeight: 'bold' }}>you</Text>
               </Text>
             </View>
@@ -74,8 +120,16 @@ const LoginView: React.FC<LoginViewProps> = ({ onLogin }) => {
             <Pressable>
               <Text style={styles.forgotPassword}>Forgot password?</Text>
             </Pressable>
-            <TouchableOpacity style={styles.googleButton} onPress={handleGoogleSignIn}>
-              <Icon name="google" size={22} color={AppColor.accent} style={{ marginRight: 8 }} />
+            <TouchableOpacity
+              style={styles.googleButton}
+              onPress={handleGoogleSignIn}
+            >
+              <Icon
+                name="google"
+                size={22}
+                color={AppColor.accent}
+                style={{ marginRight: 8 }}
+              />
               <Text style={styles.googleButtonText}>Login with Google</Text>
             </TouchableOpacity>
             <View style={styles.signupContainer}>
