@@ -1,13 +1,23 @@
-import { StyleSheet, Text, View, SafeAreaView, StatusBar, ScrollView } from 'react-native';
+import {
+  StyleSheet,
+  Text,
+  View,
+  SafeAreaView,
+  StatusBar,
+  ScrollView,
+  Linking,
+} from 'react-native';
+import { WebView } from 'react-native-webview';
 import React, { useState, useEffect } from 'react';
 
 import { LessonInterfaceArray } from '../../services/models/API_Models';
 import { getLessons } from '../../apis/bottomtabs_api/lesson_api';
 import AppColor from '../../services/styles/AppColor';
 
-
 const LearnTabView = () => {
-  const [selectedTab, setSelectedTab] = useState<'theory' | 'practice'>('theory');
+  const [selectedTab, setSelectedTab] = useState<'theory' | 'practice'>(
+    'theory',
+  );
   const [lessons, setLessons] = useState<LessonInterfaceArray>([]);
   const [loading, setLoading] = useState(false);
 
@@ -28,7 +38,10 @@ const LearnTabView = () => {
 
   return (
     <SafeAreaView style={styles.safeArea}>
-      <StatusBar backgroundColor={AppColor.background} barStyle="light-content" />
+      <StatusBar
+        backgroundColor={AppColor.background}
+        barStyle="light-content"
+      />
       <ScrollView contentContainerStyle={styles.scrollContent}>
         <View style={styles.centerRow}>
           <Text style={styles.appTitle}>
@@ -63,11 +76,43 @@ const LearnTabView = () => {
                   lessons.map(lesson => (
                     <View key={lesson.id} style={styles.lessonCard}>
                       <Text style={styles.lessonTitle}>{lesson.title}</Text>
-                      <Text style={styles.lessonLevel}>Level: {lesson.level}</Text>
-                      <Text style={styles.lessonDescription}>{lesson.description}</Text>
-                      <Text style={styles.lessonMeta}>Media: {lesson.media_id}</Text>
-                      <Text style={styles.lessonMeta}>Type: {lesson.type}</Text>
-                      <Text style={styles.lessonMeta}>Link: {lesson.lesson_link}</Text>
+                      <Text style={styles.lessonLevel}>
+                        Level: {lesson.level}
+                      </Text>
+                      <Text style={styles.lessonDescription}>
+                        {lesson.description}
+                      </Text>
+                      {lesson.media_id && lesson.media_id.trim() !== '' ? (
+                        <View style={styles.videoContainer}>
+                          <WebView
+                            style={styles.video}
+                            javaScriptEnabled={true}
+                            domStorageEnabled={true}
+                            source={{
+                              uri: `https://www.youtube.com/embed/${lesson.media_id}`,
+                            }}
+                          />
+                        </View>
+                      ) : (
+                        <Text style={styles.lessonMeta}>
+                          No Video instruction for this
+                        </Text>
+                      )}
+
+                      <View style={styles.typeRow}>
+                        <Text style={styles.lessonMetaRight}>
+                          Type: {lesson.type}
+                        </Text>
+                      </View>
+                      {lesson.lesson_link &&
+                        lesson.lesson_link.trim() !== '' && (
+                          <Text
+                            style={styles.readMoreLink}
+                            onPress={() => Linking.openURL(lesson.lesson_link)}
+                          >
+                            Read more
+                          </Text>
+                        )}
                     </View>
                   ))
                 )}
@@ -191,5 +236,46 @@ const styles = StyleSheet.create({
   lessonMeta: {
     color: AppColor.textSecondary,
     fontSize: 12,
+  },
+  typeRow: {
+    flexDirection: 'row',
+    justifyContent: 'flex-end',
+    width: '100%',
+    marginTop: 2,
+    marginBottom: 2,
+  },
+  lessonMetaRight: {
+    color: AppColor.accent,
+    fontSize: 13,
+    fontWeight: 'bold',
+    backgroundColor: AppColor.card,
+    paddingHorizontal: 10,
+    paddingVertical: 2,
+    borderRadius: 8,
+    textAlign: 'right',
+    shadowColor: '#000',
+    shadowOpacity: 0.06,
+    shadowRadius: 2,
+    elevation: 1,
+  },
+  videoContainer: {
+    width: '100%',
+    aspectRatio: 16 / 9,
+    marginBottom: 8,
+    borderRadius: 10,
+    overflow: 'hidden',
+    backgroundColor: '#000',
+  },
+  video: {
+    flex: 1,
+    borderRadius: 10,
+  },
+  readMoreLink: {
+    color: AppColor.textSecondary,
+    fontWeight: 'bold',
+    fontSize: 14,
+    marginTop: 6,
+    textDecorationLine: 'underline',
+    alignSelf: 'flex-start',
   },
 });
