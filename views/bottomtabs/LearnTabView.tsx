@@ -25,7 +25,9 @@ import {
   createUserProgress,
 } from '../../apis/bottomtabs_api/progress_api';
 import AppColor from '../../services/styles/AppColor';
+
 import Icon from 'react-native-vector-icons/MaterialIcons';
+import ActionModel from '../../components/lesson_components/ActionModel';
 
 const LearnTabView = () => {
   const [lessons, setLessons] = useState<LessonInterfaceArray>([]);
@@ -38,6 +40,7 @@ const LearnTabView = () => {
     id: 0,
     created_at: '',
   });
+  const [actionModalVisible, setActionModalVisible] = useState(false);
 
   // Modal state
   const [modalVisible, setModalVisible] = useState(false);
@@ -140,7 +143,7 @@ const LearnTabView = () => {
   };
 
   const handlePracticePress = () => {
-    console.log('Practice button pressed');
+    setActionModalVisible(true);
   };
 
   const fetchLessons = async (showLoading = true) => {
@@ -230,13 +233,13 @@ const LearnTabView = () => {
           </Text>
         </View>
         {/* ...existing code... */}
-        <View style={styles.headerRow}>
-          <Text style={styles.theoryTitle}>Theory</Text>
-          <TouchableOpacity style={styles.practiceButton} onPress={handlePracticePress}>
-            <Icon name="piano" size={24} color={AppColor.accent} />
-            {/* <Text style={styles.practiceButtonText}>Practice</Text> */}
-          </TouchableOpacity>
-        </View>
+      <View style={styles.headerRow}>
+        <Text style={styles.theoryTitle}>Theory</Text>
+        <TouchableOpacity style={styles.practiceButton} onPress={handlePracticePress}>
+          <Icon name="piano" size={24} color={AppColor.accent} />
+        </TouchableOpacity>
+      </View>
+      <ActionModel visible={actionModalVisible} onClose={() => setActionModalVisible(false)} />
         {/* ...existing code... */}
         <View style={styles.tabContent}>
           {loading ? (
