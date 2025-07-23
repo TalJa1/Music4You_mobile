@@ -47,8 +47,8 @@ function MainTabs() {
         headerShown: false,
       })}
     >
-      <Tab.Screen name="Songs" component={SongsTabView} />
       <Tab.Screen name="Learn" component={LearnTabView} />
+      <Tab.Screen name="Songs" component={SongsTabView} />
       <Tab.Screen name="Chat" component={ChatTabView} />
       <Tab.Screen name="Community" component={CommunityTabView} />
       <Tab.Screen name="Profile" component={ProfileTabView} />

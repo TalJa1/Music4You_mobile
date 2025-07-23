@@ -38,3 +38,10 @@ export interface LessonInterface {
   lesson_link: string;
   id: number;
 }
+
+export interface CreateProgressInterface {
+  user_id: number
+  lesson_id: number
+  completed: boolean
+  completed_at: string
+}

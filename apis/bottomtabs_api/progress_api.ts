@@ -1,10 +1,17 @@
 import axiosClient from '../axiosClient';
-import { ProgressInterface, ProgressInterfaceArray } from '../../services/models/API_Models';
+import {
+  CreateProgressInterface,
+  ProgressInterfaceArray,
+} from '../../services/models/API_Models';
 
-export const getUserProgressByUserId = async (user_id: number): Promise<ProgressInterfaceArray> => {
+export const getUserProgressByUserId = async (
+  user_id: number,
+): Promise<ProgressInterfaceArray> => {
   return await axiosClient.get(`/user-progress/by-user/${user_id}`);
 };
 
-export const createUserProgress = async (progress: Omit<ProgressInterface, 'id'>): Promise<ProgressInterface> => {
+export const createUserProgress = async (
+  progress: Omit<CreateProgressInterface, 'id'>,
+): Promise<CreateProgressInterface> => {
   return await axiosClient.post('/user-progress', progress);
 };
