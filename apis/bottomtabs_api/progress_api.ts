@@ -15,3 +15,10 @@ export const createUserProgress = async (
 ): Promise<CreateProgressInterface> => {
   return await axiosClient.post('/user-progress', progress);
 };
+
+export const getUserProgressByUserIdAndLessonId = async (
+  user_id: number,
+  lesson_id: number,
+): Promise<ProgressInterfaceArray> => {
+  return await axiosClient.get(`/user-progress/by-user-lesson/${user_id}/${lesson_id}`);
+};
