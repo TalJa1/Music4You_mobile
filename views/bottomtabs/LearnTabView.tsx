@@ -25,11 +25,9 @@ import {
   createUserProgress,
 } from '../../apis/bottomtabs_api/progress_api';
 import AppColor from '../../services/styles/AppColor';
+import Icon from 'react-native-vector-icons/MaterialIcons';
 
 const LearnTabView = () => {
-  const [selectedTab, setSelectedTab] = useState<'theory' | 'practice'>(
-    'theory',
-  );
   const [lessons, setLessons] = useState<LessonInterfaceArray>([]);
   const [loading, setLoading] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
@@ -141,6 +139,10 @@ const LearnTabView = () => {
     }
   };
 
+  const handlePracticePress = () => {
+    console.log('Practice button pressed');
+  };
+
   const fetchLessons = async (showLoading = true) => {
     if (showLoading) setLoading(true);
     try {
@@ -228,77 +230,66 @@ const LearnTabView = () => {
           </Text>
         </View>
         {/* ...existing code... */}
-        <View style={styles.tabRow}>
-          <Text
-            style={selectedTab === 'theory' ? styles.tabActive : styles.tab}
-            onPress={() => setSelectedTab('theory')}
-          >
-            Theory
-          </Text>
-          <Text
-            style={selectedTab === 'practice' ? styles.tabActive : styles.tab}
-            onPress={() => setSelectedTab('practice')}
-          >
-            Practice
-          </Text>
+        <View style={styles.headerRow}>
+          <Text style={styles.theoryTitle}>Theory</Text>
+          <TouchableOpacity style={styles.practiceButton} onPress={handlePracticePress}>
+            <Icon name="piano" size={24} color={AppColor.accent} />
+            {/* <Text style={styles.practiceButtonText}>Practice</Text> */}
+          </TouchableOpacity>
         </View>
         {/* ...existing code... */}
         <View style={styles.tabContent}>
-          {selectedTab === 'theory' ? (
-            loading ? (
-              <Text style={styles.text}>Loading...</Text>
-            ) : (
-              <>
-                {!lessons || lessons.length === 0 ? (
-                  <Text style={styles.text}>No lessons found.</Text>
-                ) : (
-                  lessons.map(lesson => (
-                    <View key={lesson.id} style={styles.lessonCard}>
-                      <Text style={styles.lessonTitle}>{lesson.title}</Text>
-                      <Text style={styles.lessonLevel}>
-                        Level: {lesson.level}
+          {loading ? (
+            <Text style={styles.text}>Loading...</Text>
+          ) : (
+            <>
+              {!lessons || lessons.length === 0 ? (
+                <Text style={styles.text}>No lessons found.</Text>
+              ) : (
+                lessons.map(lesson => (
+                  <View key={lesson.id} style={styles.lessonCard}>
+                    <Text style={styles.lessonTitle}>{lesson.title}</Text>
+                    <Text style={styles.lessonLevel}>
+                      Level: {lesson.level}
+                    </Text>
+                    <Text style={styles.lessonDescription}>
+                      {lesson.description}
+                    </Text>
+                    {lesson.media_id && lesson.media_id.trim() !== '' ? (
+                      <View style={styles.videoContainer}>
+                        <WebView
+                          style={styles.video}
+                          javaScriptEnabled={true}
+                          domStorageEnabled={true}
+                          source={{
+                            uri: `https://www.youtube.com/embed/${lesson.media_id}`,
+                          }}
+                        />
+                      </View>
+                    ) : (
+                      <Text style={styles.lessonMeta}>
+                        No Video instruction for this
                       </Text>
-                      <Text style={styles.lessonDescription}>
-                        {lesson.description}
+                    )}
+
+                    <View style={styles.typeRow}>
+                      <Text style={styles.lessonMetaRight}>
+                        Type: {lesson.type}
                       </Text>
-                      {lesson.media_id && lesson.media_id.trim() !== '' ? (
-                        <View style={styles.videoContainer}>
-                          <WebView
-                            style={styles.video}
-                            javaScriptEnabled={true}
-                            domStorageEnabled={true}
-                            source={{
-                              uri: `https://www.youtube.com/embed/${lesson.media_id}`,
-                            }}
-                          />
-                        </View>
-                      ) : (
-                        <Text style={styles.lessonMeta}>
-                          No Video instruction for this
+                    </View>
+                    {lesson.lesson_link &&
+                      lesson.lesson_link.trim() !== '' && (
+                        <Text
+                          style={styles.readMoreLink}
+                          onPress={() => handleCheckProgressAndOpen(lesson)}
+                        >
+                          Learn more here
                         </Text>
                       )}
-
-                      <View style={styles.typeRow}>
-                        <Text style={styles.lessonMetaRight}>
-                          Type: {lesson.type}
-                        </Text>
-                      </View>
-                      {lesson.lesson_link &&
-                        lesson.lesson_link.trim() !== '' && (
-                          <Text
-                            style={styles.readMoreLink}
-                            onPress={() => handleCheckProgressAndOpen(lesson)}
-                          >
-                            Learn more here
-                          </Text>
-                        )}
-                    </View>
-                  ))
-                )}
-              </>
-            )
-          ) : (
-            <Text style={styles.text}>Practice content goes here.</Text>
+                  </View>
+                ))
+              )}
+            </>
           )}
         </View>
       </ScrollView>
@@ -350,6 +341,7 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     borderRadius: 8,
     alignItems: 'center',
+    display: 'flex',
   },
   modalButtonText: {
     fontSize: 16,
@@ -378,30 +370,31 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: AppColor.accent,
   },
-  tabRow: {
+  headerRow: {
     flexDirection: 'row',
-    justifyContent: 'space-evenly',
+    justifyContent: 'space-between',
     alignItems: 'center',
     marginBottom: 16,
     marginTop: 8,
+    paddingHorizontal: 16,
   },
-  tab: {
-    fontSize: 18,
-    color: AppColor.textSecondary,
-    paddingVertical: 8,
-    paddingHorizontal: 24,
-    borderBottomWidth: 2,
-    borderBottomColor: 'transparent',
-    marginHorizontal: 8,
+  theoryTitle: {
+    fontSize: 24,
+    color: AppColor.text,
+    fontWeight: 'bold',
   },
-  tabActive: {
-    fontSize: 18,
-    color: AppColor.accent,
+  practiceButton: {
     paddingVertical: 8,
-    paddingHorizontal: 24,
-    borderBottomWidth: 2,
-    borderBottomColor: AppColor.accent,
-    marginHorizontal: 8,
+    paddingHorizontal: 16,
+    borderRadius: 8,
+    shadowColor: '#000',
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 2,
+  },
+  practiceButtonText: {
+    fontSize: 16,
+    color: AppColor.background,
     fontWeight: 'bold',
   },
   tabContent: {
