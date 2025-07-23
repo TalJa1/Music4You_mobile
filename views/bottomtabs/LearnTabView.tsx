@@ -7,6 +7,7 @@ import {
   ScrollView,
   Linking,
   RefreshControl,
+  Alert,
 } from 'react-native';
 import { WebView } from 'react-native-webview';
 
@@ -15,6 +16,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import { LessonInterfaceArray } from '../../services/models/API_Models';
 import { getLessons } from '../../apis/bottomtabs_api/lesson_api';
+import { getUserProgressByUserIdAndLessonId } from '../../apis/bottomtabs_api/progress_api';
 import AppColor from '../../services/styles/AppColor';
 
 const LearnTabView = () => {
@@ -40,8 +42,30 @@ const LearnTabView = () => {
     loadUser();
   }, []);
 
-  console.log('User Data:', user);
-  
+  const handleCheckProgressAndOpen = async (lesson: any) => {
+    if (!user) {
+      Alert.alert('User not found', 'Please log in again.');
+      return;
+    }
+    try {
+      const progress = await getUserProgressByUserIdAndLessonId(
+        user.id,
+        lesson.id,
+      );
+      if (progress && progress.length > 0) {
+        Alert.alert('Progress found', 'You have already started this lesson.');
+      } else {
+        Alert.alert('No progress', 'You have not started this lesson yet.');
+      }
+    } catch (e: any) {
+      if (e?.response?.status === 404) {
+        Alert.alert('No progress', 'You have not started this lesson yet.');
+      } else {
+        Alert.alert('Error', 'Could not check progress.');
+      }
+    }
+    // Linking.openURL(lesson.lesson_link);
+  };
 
   const fetchLessons = async (showLoading = true) => {
     if (showLoading) setLoading(true);
@@ -142,7 +166,7 @@ const LearnTabView = () => {
                         lesson.lesson_link.trim() !== '' && (
                           <Text
                             style={styles.readMoreLink}
-                            onPress={() => Linking.openURL(lesson.lesson_link)}
+                            onPress={() => handleCheckProgressAndOpen(lesson)}
                           >
                             Learn more here
                           </Text>
