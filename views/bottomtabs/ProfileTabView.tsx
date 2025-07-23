@@ -2,19 +2,27 @@ import { StyleSheet, Text, View, SafeAreaView, StatusBar, ScrollView, Image } fr
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import React, { useEffect, useState } from 'react';
 import AppColor from '../../services/styles/AppColor';
-import { GoogleSignin, User } from '@react-native-google-signin/google-signin';
+import { GoogleSignin } from '@react-native-google-signin/google-signin';
+import { getUserByEmail } from '../../apis/login/login_api';
+import { UserInterface } from '../../services/models/API_Models';
 
 
 
 const ProfileTabView = () => {
-  const [user, setUser] = useState<User['user'] | null>(null);
+  const [user, setUser] = useState<UserInterface | null>(null);
 
   useEffect(() => {
-    // Try to get current Google user info
+    // Try to get current Google user info, then fetch user from DB by email
     const fetchUser = async () => {
       try {
         const currentUser = await GoogleSignin.getCurrentUser();
-        setUser(currentUser?.user ?? null);
+        const email = currentUser?.user?.email;
+        if (email) {
+          const dbUser = await getUserByEmail(email);
+          setUser(dbUser);
+        } else {
+          setUser(null);
+        }
       } catch (e) {
         setUser(null);
       }
@@ -45,10 +53,10 @@ const ProfileTabView = () => {
           {/* Profile Info */}
           <View style={styles.profileCard}>
             <Image
-              source={user?.photo ? { uri: user.photo } : require('../../assets/images/default-avatar.png')}
+              source={user?.avatar_url ? { uri: user.avatar_url } : require('../../assets/images/default-avatar.png')}
               style={styles.avatar}
             />
-            <Text style={styles.name}>{user?.name || 'Your Name'}</Text>
+            <Text style={styles.name}>{user?.username || 'Your Name'}</Text>
             <Text style={styles.email}>{user?.email || 'your@email.com'}</Text>
           </View>
 

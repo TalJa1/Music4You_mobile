@@ -55,7 +55,7 @@ const LoginView: React.FC<LoginViewProps> = ({ onLogin }) => {
         try {
           if (!email) throw new Error('No email found from Google account.');
           await createUser({
-            username: email.split('@')[0],
+            username: userInfo.data?.user.name || email.split('@')[0],
             email,
             avatar_url: userInfo.data?.user.photo || '',
           });
