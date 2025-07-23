@@ -58,7 +58,7 @@ const ProfileTabView = () => {
       : [allAchievements[0]];
   const reminders = [
     { id: 1, text: 'Practice guitar for 30 minutes today' },
-    { id: 2, text: 'Complete lesson 3 in React Native course' },
+    { id: 2, text: 'Complete lesson 3 in Music4You course' },
   ];
 
   return (
