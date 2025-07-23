@@ -110,7 +110,7 @@ const LearnTabView = () => {
                             style={styles.readMoreLink}
                             onPress={() => Linking.openURL(lesson.lesson_link)}
                           >
-                            Read more
+                            Learn more here
                           </Text>
                         )}
                     </View>
