@@ -1,0 +1,12 @@
+import axiosClient from '../axiosClient';
+import { UserInterface } from '../../services/models/API_Models';
+
+export const createUser = async (
+  userData: Omit<UserInterface, 'id' | 'created_at'>,
+): Promise<UserInterface> => {
+  return await axiosClient.post('/users', userData);
+};
+
+export const getUserById = async (id: number): Promise<UserInterface> => {
+  return await axiosClient.get(`/users/${id}`);
+};

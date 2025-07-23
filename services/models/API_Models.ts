@@ -8,3 +8,11 @@ export interface SongInterface {
   video_id: string
   id: number
 }
+
+export interface UserInterface {
+  username: string
+  email: string
+  avatar_url: string
+  id: number
+  created_at: string
+}
