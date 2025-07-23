@@ -49,7 +49,7 @@ const ProfileTabView = () => {
   };
   const allAchievements = [
     { id: 1, label: 'Profile Completed', icon: 'account-check' },
-    { id: 2, label: 'First Song Uploaded/Learned', icon: 'music' },
+    { id: 2, label: 'First Song Learned', icon: 'music' },
     { id: 3, label: '7-Day Streak', icon: 'fire' },
   ];
   const achievements =
