@@ -67,6 +67,7 @@ const LearnTabView = () => {
                       <Text style={styles.lessonDescription}>{lesson.description}</Text>
                       <Text style={styles.lessonMeta}>Media: {lesson.media_id}</Text>
                       <Text style={styles.lessonMeta}>Type: {lesson.type}</Text>
+                      <Text style={styles.lessonMeta}>Link: {lesson.lesson_link}</Text>
                     </View>
                   ))
                 )}
