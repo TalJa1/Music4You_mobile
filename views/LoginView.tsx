@@ -20,6 +20,7 @@ import {
 } from '@react-native-google-signin/google-signin';
 import AppColor from '../services/styles/AppColor';
 import { getUserByEmail, createUser } from '../apis/login/login_api';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 type LoginViewProps = {
   onLogin: () => void;
@@ -50,15 +51,17 @@ const LoginView: React.FC<LoginViewProps> = ({ onLogin }) => {
         }
       }
       if (user) {
+        await AsyncStorage.setItem('user', JSON.stringify(user));
         onLogin();
       } else {
         try {
           if (!email) throw new Error('No email found from Google account.');
-          await createUser({
+          const newUser = await createUser({
             username: userInfo.data?.user.name || email.split('@')[0],
             email,
             avatar_url: userInfo.data?.user.photo || '',
           });
+          await AsyncStorage.setItem('user', JSON.stringify(newUser));
           onLogin();
         } catch (err: any) {
           Alert.alert(

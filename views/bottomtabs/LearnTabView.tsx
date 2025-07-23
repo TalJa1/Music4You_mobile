@@ -9,7 +9,9 @@ import {
   RefreshControl,
 } from 'react-native';
 import { WebView } from 'react-native-webview';
+
 import React, { useState, useEffect } from 'react';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import { LessonInterfaceArray } from '../../services/models/API_Models';
 import { getLessons } from '../../apis/bottomtabs_api/lesson_api';
@@ -22,6 +24,24 @@ const LearnTabView = () => {
   const [lessons, setLessons] = useState<LessonInterfaceArray>([]);
   const [loading, setLoading] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
+  const [user, setUser] = useState<any>(null);
+
+  useEffect(() => {
+    const loadUser = async () => {
+      try {
+        const userData = await AsyncStorage.getItem('user');
+        if (userData) {
+          setUser(JSON.parse(userData));
+        }
+      } catch (e) {
+        setUser(null);
+      }
+    };
+    loadUser();
+  }, []);
+
+  console.log('User Data:', user);
+  
 
   const fetchLessons = async (showLoading = true) => {
     if (showLoading) setLoading(true);
