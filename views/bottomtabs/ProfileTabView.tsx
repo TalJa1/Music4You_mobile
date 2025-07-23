@@ -42,10 +42,7 @@ const ProfileTabView = () => {
 
   const currentCourse = {
     title: 'Course progress',
-    progress:
-      progress.length > 0
-        ? progress.filter(p => p.completed).length / progress.length
-        : 0,
+    progress: progress.length > 0 ? progress.length / 10 : 0,
   };
   const allAchievements = [
     { id: 1, label: 'Profile Completed', icon: 'account-check' },
@@ -82,9 +79,9 @@ const ProfileTabView = () => {
             <View style={styles.courseCard}>
               <Text style={styles.courseTitle}>{currentCourse.title}</Text>
               <View style={styles.progressBarBg}>
-                <View style={[styles.progressBar, { width: `${currentCourse.progress * 100}%` }]} />
+                <View style={[styles.progressBar, { width: `${Math.min(currentCourse.progress * 100, 100)}%` }]} />
               </View>
-              <Text style={styles.progressText}>{Math.round(currentCourse.progress * 100)}% complete</Text>
+              <Text style={styles.progressText}>{Math.round(Math.min(currentCourse.progress * 100, 100))}% complete</Text>
             </View>
           </View>
 
