@@ -75,7 +75,7 @@ const LearnTabView = () => {
         user.id,
         lesson.id,
       );
-
+      
       if (progressRes) {
         setModalContent({
           title: 'Progress found',

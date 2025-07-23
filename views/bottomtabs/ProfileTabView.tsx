@@ -1,44 +1,77 @@
-import { StyleSheet, Text, View, SafeAreaView, StatusBar, ScrollView, Image } from 'react-native';
+/* eslint-disable react-hooks/exhaustive-deps */
+import {
+  StyleSheet,
+  Text,
+  View,
+  SafeAreaView,
+  StatusBar,
+  ScrollView,
+  Image,
+  RefreshControl,
+} from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import React, { useEffect, useState } from 'react';
 import AppColor from '../../services/styles/AppColor';
-import { GoogleSignin } from '@react-native-google-signin/google-signin';
-import { getUserByEmail } from '../../apis/login/login_api';
 import { getUserProgressByUserId } from '../../apis/bottomtabs_api/progress_api';
-import { UserInterface, ProgressInterfaceArray } from '../../services/models/API_Models';
-
-
+import {
+  UserInterface,
+  ProgressInterfaceArray,
+} from '../../services/models/API_Models';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const ProfileTabView = () => {
-  const [user, setUser] = useState<UserInterface | null>(null);
+  const [user, setUser] = useState<UserInterface>({
+    username: '',
+    email: '',
+    avatar_url: '',
+    id: 0,
+    created_at: '',
+  });
   const [progress, setProgress] = useState<ProgressInterfaceArray>([]);
+  const [refreshing, setRefreshing] = useState(false);
 
   useEffect(() => {
-    // Try to get current Google user info, then fetch user from DB by email
-    const fetchUserAndProgress = async () => {
+    const loadUser = async () => {
       try {
-        const currentUser = await GoogleSignin.getCurrentUser();
-        const email = currentUser?.user?.email;
-        if (email) {
-          const dbUser = await getUserByEmail(email);
-          setUser(dbUser);
-          if (dbUser?.id) {
-            const userProgress = await getUserProgressByUserId(dbUser.id);
-            setProgress(userProgress);
-          } else {
-            setProgress([]);
-          }
-        } else {
-          setUser(null);
-          setProgress([]);
+        const userData = await AsyncStorage.getItem('user');
+        if (userData) {
+          setUser(JSON.parse(userData));
         }
       } catch (e) {
-        setUser(null);
-        setProgress([]);
+        setUser({
+          username: '',
+          email: '',
+          avatar_url: '',
+          id: 0,
+          created_at: '',
+        });
       }
     };
-    fetchUserAndProgress();
+    loadUser();
   }, []);
+
+  const fetchProgress = async () => {
+    try {
+      if (user && user.id) {
+        const userProgress = await getUserProgressByUserId(user.id);
+        setProgress(userProgress);
+      } else {
+        setProgress([]);
+      }
+    } catch (e) {
+      setProgress([]);
+    }
+  };
+
+  useEffect(() => {
+    fetchProgress();
+  }, [user]);
+
+  const onRefresh = async () => {
+    setRefreshing(true);
+    await fetchProgress();
+    setRefreshing(false);
+  };
 
   const currentCourse = {
     title: 'Course progress',
@@ -50,9 +83,7 @@ const ProfileTabView = () => {
     { id: 3, label: '1-Day Streak', icon: 'fire' },
   ];
   const achievements =
-    currentCourse.progress > 0
-      ? allAchievements
-      : [allAchievements[0]];
+    currentCourse.progress > 0 ? allAchievements : [allAchievements[0]];
   const reminders = [
     { id: 1, text: 'Practice guitar for 30 minutes today' },
     { id: 2, text: 'Complete lesson 3 in Music4You course' },
@@ -60,13 +91,25 @@ const ProfileTabView = () => {
 
   return (
     <SafeAreaView style={styles.safeArea}>
-      <StatusBar backgroundColor={AppColor.background} barStyle="light-content" />
-      <ScrollView contentContainerStyle={styles.scrollContent}>
+      <StatusBar
+        backgroundColor={AppColor.background}
+        barStyle="light-content"
+      />
+      <ScrollView
+        contentContainerStyle={styles.scrollContent}
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+        }
+      >
         <View style={styles.container}>
           {/* Profile Info */}
           <View style={styles.profileCard}>
             <Image
-              source={user?.avatar_url ? { uri: user.avatar_url } : require('../../assets/images/default-avatar.png')}
+              source={
+                user?.avatar_url
+                  ? { uri: user.avatar_url }
+                  : require('../../assets/images/default-avatar.png')
+              }
               style={styles.avatar}
             />
             <Text style={styles.name}>{user?.username || 'Your Name'}</Text>
@@ -79,9 +122,19 @@ const ProfileTabView = () => {
             <View style={styles.courseCard}>
               <Text style={styles.courseTitle}>{currentCourse.title}</Text>
               <View style={styles.progressBarBg}>
-                <View style={[styles.progressBar, { width: `${Math.min(currentCourse.progress * 100, 100)}%` }]} />
+                <View
+                  style={[
+                    styles.progressBar,
+                    {
+                      width: `${Math.min(currentCourse.progress * 100, 100)}%`,
+                    },
+                  ]}
+                />
               </View>
-              <Text style={styles.progressText}>{Math.round(Math.min(currentCourse.progress * 100, 100))}% complete</Text>
+              <Text style={styles.progressText}>
+                {Math.round(Math.min(currentCourse.progress * 100, 100))}%
+                complete
+              </Text>
             </View>
           </View>
 
