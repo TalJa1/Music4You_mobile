@@ -1,3 +1,4 @@
+/* eslint-disable react-native/no-inline-styles */
 import {
   StyleSheet,
   Text,
@@ -41,15 +42,20 @@ const ExerciseView = () => {
   return (
     <SafeAreaView style={styles.safeArea}>
       <View style={styles.headerRow}>
-        <TouchableOpacity
-          onPress={() => navigation.goBack()}
-          style={styles.backButton}
-        >
-          <Icon name="arrow-back" size={28} color={AppColor.buttonText} />
-        </TouchableOpacity>
+        <View style={styles.headerColLeft}>
+          <TouchableOpacity
+            onPress={() => navigation.goBack()}
+            style={styles.backButton}
+          >
+            <Icon name="arrow-back" size={28} color={AppColor.buttonText} />
+          </TouchableOpacity>
+        </View>
+        <View style={styles.headerColCenter}>
+          <Text style={styles.titleOnRow}>Exercises</Text>
+        </View>
+        <View style={styles.headerColRight} />
       </View>
       <ScrollView contentContainerStyle={styles.scrollContent}>
-        <Text style={styles.title}>Exercises</Text>
         {loading && <Text>Loading...</Text>}
         {error ? <Text style={styles.error}>{error}</Text> : null}
         {!loading && !error && exercises.length === 0 && (
@@ -213,9 +219,28 @@ const styles = StyleSheet.create({
     width: '100%',
     flexDirection: 'row',
     alignItems: 'center',
+    justifyContent: 'space-between',
     paddingTop: 8,
-    paddingLeft: 8,
     marginBottom: 0,
+  },
+  headerColLeft: {
+    flex: 1,
+    alignItems: 'flex-start',
+    paddingLeft: 8,
+  },
+  headerColCenter: {
+    flex: 2,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  headerColRight: {
+    flex: 1,
+  },
+  titleOnRow: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    color: AppColor.text,
+    textAlign: 'center',
   },
   backButton: {
     padding: 8,
