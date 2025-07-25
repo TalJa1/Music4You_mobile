@@ -14,7 +14,9 @@ import {
 import Markdown from 'react-native-markdown-display';
 import React, { useState, useRef } from 'react';
 import Icon from 'react-native-vector-icons/MaterialIcons';
+
 import AppColor from '../../services/styles/AppColor';
+import { OPENAI_CHAT_API_URL } from '@env';
 
 const ChatTabView = () => {
   const [messages, setMessages] = useState([
@@ -35,8 +37,9 @@ const ChatTabView = () => {
     scrollViewRef.current?.scrollToEnd({ animated: true });
 
     try {
+      console.log('API URL:', OPENAI_CHAT_API_URL);
       const response = await fetch(
-        'https://api.lenguyenbaolong.art/api/v1/chats_openai/07e10f265e6411f0ae912ec3e04057e5/chat/completions',
+        OPENAI_CHAT_API_URL,
         {
           method: 'POST',
           headers: {

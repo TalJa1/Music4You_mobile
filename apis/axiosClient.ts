@@ -1,7 +1,5 @@
 import axios from 'axios';
-
-// Use 10.0.2.2 for Android emulator to access host PC's localhost
-const API_BASE_URL = 'http://10.0.2.2:8000/api/v1';
+import { API_BASE_URL } from '@env';
 
 const axiosClient = axios.create({
   baseURL: API_BASE_URL,
