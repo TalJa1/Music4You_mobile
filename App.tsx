@@ -13,6 +13,7 @@ import ProfileTabView from './views/bottomtabs/ProfileTabView';
 import AppColor from './services/styles/AppColor';
 import AddSong from './components/songs_components/AddSong';
 import ChatTabView from './views/bottomtabs/ChatTabView';
+import ExerciseView from './views/learningtab/ExerciseView';
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -74,6 +75,11 @@ export default function App() {
               name="AddSong"
               component={AddSong}
               options={{ title: 'Add Song' }}
+            />
+            <Stack.Screen
+              name="Exercise"
+              component={ExerciseView}
+              options={{ title: 'Exercise' }}
             />
           </>
         )}

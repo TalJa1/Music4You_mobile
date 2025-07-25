@@ -45,3 +45,13 @@ export interface CreateProgressInterface {
   completed: boolean
   completed_at: string
 }
+
+export type ExerciseInterfaceArray = ExerciseInterface[]
+
+export interface ExerciseInterface {
+  lesson_id: number
+  title: string
+  type: string
+  content: string
+  id: number
+}

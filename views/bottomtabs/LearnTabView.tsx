@@ -1,3 +1,4 @@
+/* eslint-disable react-native/no-inline-styles */
 import {
   StyleSheet,
   Text,
@@ -13,6 +14,7 @@ import {
 import { WebView } from 'react-native-webview';
 
 import React, { useState, useEffect } from 'react';
+import { useNavigation, NavigationProp } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import {
@@ -29,7 +31,14 @@ import AppColor from '../../services/styles/AppColor';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import ActionModel from '../../components/lesson_components/ActionModel';
 
+type RootStackParamList = {
+  LearnTab: undefined;
+  Exercise: { lessonId: number };
+  // add other routes if needed
+};
+
 const LearnTabView = () => {
+  const navigation = useNavigation<NavigationProp<RootStackParamList>>();
   const [lessons, setLessons] = useState<LessonInterfaceArray>([]);
   const [loading, setLoading] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
@@ -287,12 +296,33 @@ const LearnTabView = () => {
                       </Text>
                     </View>
                     {lesson.lesson_link && lesson.lesson_link.trim() !== '' && (
-                      <Text
-                        style={styles.readMoreLink}
-                        onPress={() => handleCheckProgressAndOpen(lesson)}
+                      <View
+                        style={{
+                          flexDirection: 'row',
+                          alignItems: 'center',
+                          justifyContent: 'space-between',
+                          marginTop: 6,
+                        }}
                       >
-                        Learn more here
-                      </Text>
+                        <Text
+                          style={styles.readMoreLink}
+                          onPress={() => handleCheckProgressAndOpen(lesson)}
+                        >
+                          Learn more here
+                        </Text>
+                        <TouchableOpacity
+                          style={styles.exerciseButton}
+                          onPress={() =>
+                            navigation.navigate('Exercise', {
+                              lessonId: lesson.id,
+                            })
+                          }
+                        >
+                          <Text style={styles.exerciseButtonText}>
+                            Exercise
+                          </Text>
+                        </TouchableOpacity>
+                      </View>
                     )}
                   </View>
                 ))
@@ -504,5 +534,17 @@ const styles = StyleSheet.create({
     marginTop: 6,
     textDecorationLine: 'underline',
     alignSelf: 'flex-start',
+  },
+  exerciseButton: {
+    marginLeft: 12,
+    backgroundColor: AppColor.primary,
+    paddingVertical: 4,
+    paddingHorizontal: 12,
+    borderRadius: 6,
+  },
+  exerciseButtonText: {
+    color: AppColor.buttonText,
+    fontWeight: 'bold',
+    fontSize: 14,
   },
 });
