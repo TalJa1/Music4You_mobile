@@ -76,7 +76,7 @@ const LearnTabView = () => {
         user.id,
         lesson.id,
       );
-      
+
       if (progressRes) {
         setModalContent({
           title: 'Progress found',
@@ -233,13 +233,19 @@ const LearnTabView = () => {
           </Text>
         </View>
         {/* ...existing code... */}
-      <View style={styles.headerRow}>
-        <Text style={styles.theoryTitle}>Theory</Text>
-        <TouchableOpacity style={styles.practiceButton} onPress={handlePracticePress}>
-          <Icon name="piano" size={24} color={AppColor.accent} />
-        </TouchableOpacity>
-      </View>
-      <ActionModel visible={actionModalVisible} onClose={() => setActionModalVisible(false)} />
+        <View style={styles.headerRow}>
+          <Text style={styles.theoryTitle}>Theory</Text>
+          <TouchableOpacity
+            style={styles.practiceButton}
+            onPress={handlePracticePress}
+          >
+            <Icon name="piano" size={24} color={AppColor.accent} />
+          </TouchableOpacity>
+        </View>
+        <ActionModel
+          visible={actionModalVisible}
+          onClose={() => setActionModalVisible(false)}
+        />
         {/* ...existing code... */}
         <View style={styles.tabContent}>
           {loading ? (
@@ -280,15 +286,14 @@ const LearnTabView = () => {
                         Type: {lesson.type}
                       </Text>
                     </View>
-                    {lesson.lesson_link &&
-                      lesson.lesson_link.trim() !== '' && (
-                        <Text
-                          style={styles.readMoreLink}
-                          onPress={() => handleCheckProgressAndOpen(lesson)}
-                        >
-                          Learn more here
-                        </Text>
-                      )}
+                    {lesson.lesson_link && lesson.lesson_link.trim() !== '' && (
+                      <Text
+                        style={styles.readMoreLink}
+                        onPress={() => handleCheckProgressAndOpen(lesson)}
+                      >
+                        Learn more here
+                      </Text>
+                    )}
                   </View>
                 ))
               )}
