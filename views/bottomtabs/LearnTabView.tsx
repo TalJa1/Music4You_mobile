@@ -34,6 +34,7 @@ import ActionModel from '../../components/lesson_components/ActionModel';
 type RootStackParamList = {
   LearnTab: undefined;
   Exercise: { lessonId: number };
+  PianoPractice: undefined;
   // add other routes if needed
 };
 
@@ -152,7 +153,7 @@ const LearnTabView = () => {
   };
 
   const handlePracticePress = () => {
-    setActionModalVisible(true);
+    navigation.navigate('PianoPractice');
   };
 
   const fetchLessons = async (showLoading = true) => {
