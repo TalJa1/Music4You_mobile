@@ -1,6 +1,7 @@
 /* eslint-disable react-native/no-inline-styles */
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
+import { useNavigation } from '@react-navigation/native';
 import {
   View,
   Text,
@@ -12,6 +13,7 @@ import {
   SafeAreaView,
   ScrollView,
 } from 'react-native';
+import { Camera, useCameraDevices } from 'react-native-vision-camera';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 
@@ -23,9 +25,17 @@ const PARTICIPANTS = [
 
 const PracticeRoomView = () => {
   const windowHeight = Dimensions.get('window').height;
+  const navigation = useNavigation();
   const [userName, setUserName] = useState('');
   const [cameraOn, setCameraOn] = useState(true);
   const [frontCamera, setFrontCamera] = useState(true);
+  const [hasPermission, setHasPermission] = useState(false);
+  const [micOn, setMicOn] = useState(true);
+  const cameraRef = useRef(null);
+  const devices = useCameraDevices();
+  const device = devices.find(
+    (d: any) => d.position === (frontCamera ? 'front' : 'back'),
+  );
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -40,26 +50,43 @@ const PracticeRoomView = () => {
       }
     };
     fetchUser();
+    (async () => {
+      const permission = await Camera.requestCameraPermission();
+      const perm: any = permission;
+      if (typeof perm === 'object' && perm !== null && 'status' in perm) {
+        setHasPermission(perm.status === 'authorized');
+      } else {
+        setHasPermission(perm === 'authorized' || perm === 'granted');
+      }
+    })();
   }, []);
-
-  // Demo camera image URIs for front/back
-  const frontCameraUri = 'https://images.unsplash.com/photo-1519125323398-675f0ddb6308?auto=format&fit=crop&w=800&q=80';
-  const backCameraUri = 'https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=800&q=80';
 
   return (
     <SafeAreaView style={styles.safeArea}>
       <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
         <View style={styles.container}>
           {/* Large camera preview */}
-          <View style={[styles.cameraPreview, { height: windowHeight * 0.55 }]}> 
-            {cameraOn ? (
-              <Image
-                source={{ uri: frontCamera ? frontCameraUri : backCameraUri }}
+          <View style={[styles.cameraPreview, { height: windowHeight * 0.55 }]}>
+            {cameraOn && hasPermission && device ? (
+              <Camera
+                ref={cameraRef}
                 style={styles.cameraImage}
-                resizeMode="cover"
+                device={device}
+                isActive={cameraOn}
+                photo={false}
+                video={false}
               />
             ) : (
-              <View style={[styles.cameraImage, { backgroundColor: '#222', justifyContent: 'center', alignItems: 'center' }]}> 
+              <View
+                style={[
+                  styles.cameraImage,
+                  {
+                    backgroundColor: '#222',
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                  },
+                ]}
+              >
                 <Icon name="video-off" size={64} color="#888" />
               </View>
             )}
@@ -72,24 +99,40 @@ const PracticeRoomView = () => {
 
           {/* Call controls */}
           <View style={styles.controlsRow}>
-            <TouchableOpacity style={styles.controlButton}>
-              <Icon name="microphone" size={28} color="#fff" />
+            <TouchableOpacity
+              style={styles.controlButton}
+              onPress={() => setMicOn(m => !m)}
+            >
+              <Icon
+                name={micOn ? 'microphone' : 'microphone-off'}
+                size={28}
+                color={micOn ? '#fff' : '#888'}
+              />
             </TouchableOpacity>
             <TouchableOpacity
               style={styles.controlButton}
               onPress={() => setCameraOn(on => !on)}
             >
-              <Icon name={cameraOn ? 'video' : 'video-off'} size={28} color="#fff" />
+              <Icon
+                name={cameraOn ? 'video' : 'video-off'}
+                size={28}
+                color="#fff"
+              />
             </TouchableOpacity>
             <TouchableOpacity
               style={styles.controlButton}
               onPress={() => setFrontCamera(f => !f)}
               disabled={!cameraOn}
             >
-              <Icon name="camera" size={28} color={cameraOn ? '#fff' : '#888'} />
+              <Icon
+                name="rotate-360"
+                size={28}
+                color={cameraOn ? '#fff' : '#888'}
+              />
             </TouchableOpacity>
             <TouchableOpacity
               style={[styles.controlButton, styles.hangupButton]}
+              onPress={() => navigation.goBack()}
             >
               <Icon name="phone-hangup" size={28} color="#fff" />
             </TouchableOpacity>
