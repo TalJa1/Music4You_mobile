@@ -9,6 +9,9 @@ import {
   ScrollView,
 } from 'react-native';
 import React, { useState } from 'react';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { getUserByEmail } from '../../apis/login/login_api';
+import { createPracticeRoom } from '../../apis/bottomtabs_api/practiceroom_api';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import { useNavigation } from '@react-navigation/native';
 import AppColor from '../../services/styles/AppColor';
@@ -29,16 +32,31 @@ const CreatePracticeRoom = () => {
   );
   const [createdAt] = useState(() => new Date());
 
-  const handleCreate = () => {
+  const handleCreate = async () => {
     if (!roomName.trim()) {
       Alert.alert('Validation', 'Please enter a room name.');
       return;
     }
-    // Here you would call your API to create the room
-    Alert.alert(
-      'Practice Room Created',
-      `Room: ${roomName}\nInstrument: ${selectedInstrument}`,
-    );
+    try {
+      const userData = await AsyncStorage.getItem('user');
+      if (!userData) throw new Error('User not found');
+      const user = JSON.parse(userData);
+      if (!user.email) throw new Error('User email not found');
+      // Get user by email to get ID
+      const userObj = await getUserByEmail(user.email);
+      const host_user_id = userObj.id;
+      const newRoom = {
+        room_name: roomName,
+        host_user_id,
+        instrument: selectedInstrument,
+      };
+      await createPracticeRoom(newRoom);
+      Alert.alert('Success', 'Practice room created successfully!', [
+        { text: 'OK', onPress: () => navigation.goBack() },
+      ]);
+    } catch (err) {
+      Alert.alert('Error', 'Failed to create practice room.');
+    }
   };
 
   const isFormValid = roomName.trim().length > 0 && selectedInstrument;
