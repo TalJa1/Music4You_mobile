@@ -46,15 +46,19 @@ const CreatePracticeRoom = () => {
   return (
     <SafeAreaView style={styles.safeArea}>
       <View style={styles.backRow}>
-        <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()} activeOpacity={0.7}>
+        <TouchableOpacity
+          style={styles.backButton}
+          onPress={() => navigation.goBack()}
+          activeOpacity={0.7}
+        >
           <Icon name="arrow-back" size={30} color={AppColor.primary} />
         </TouchableOpacity>
       </View>
-      <Text style={styles.title}>Create Practice Room</Text>
       <ScrollView
         contentContainerStyle={styles.scrollContent}
         keyboardShouldPersistTaps="handled"
       >
+        <Text style={styles.title}>Create Practice Room</Text>
         <View style={styles.centeredFields}>
           <TextInput
             style={styles.input}
@@ -99,7 +103,10 @@ const CreatePracticeRoom = () => {
             </Text>
           </View>
           <TouchableOpacity
-            style={[styles.createButton, !isFormValid && styles.createButtonDisabled]}
+            style={[
+              styles.createButton,
+              !isFormValid && styles.createButtonDisabled,
+            ]}
             onPress={handleCreate}
             activeOpacity={0.8}
             disabled={!isFormValid}
@@ -120,15 +127,12 @@ const styles = StyleSheet.create({
     backgroundColor: AppColor.background,
   },
   scrollContent: {
-    flexGrow: 1,
     padding: 24,
-    justifyContent: 'flex-start',
-    alignItems: 'center',
   },
   centeredFields: {
     width: '100%',
+    marginTop: 20,
     alignItems: 'center',
-    justifyContent: 'center',
   },
   backRow: {
     flexDirection: 'row',
