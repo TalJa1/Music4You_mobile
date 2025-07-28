@@ -84,6 +84,13 @@ const CommunityTabView = () => {
   return (
     <SafeAreaView style={styles.safeArea}>
       <StatusBar backgroundColor={AppColor.background} barStyle="light-content" />
+      <View style={styles.centerRow}>
+        <Text style={styles.appTitle}>
+          <Text style={styles.bold}>Music</Text>
+          <Text style={styles.boldAccent}>4</Text>
+          <Text style={styles.bold}>Younity</Text>
+        </Text>
+      </View>
       <View style={styles.tabBarContainer}>
         <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.tabBar}>
           {INSTRUMENTS.map(inst => (
@@ -132,6 +139,28 @@ const CommunityTabView = () => {
 export default CommunityTabView;
 
 const styles = StyleSheet.create({
+  centerRow: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginTop: 10,
+    marginBottom: 16,
+  },
+  appTitle: {
+    fontSize: 38,
+    color: AppColor.text,
+    marginBottom: 8,
+    textAlign: 'center',
+    flexDirection: 'row',
+  },
+  bold: {
+    fontWeight: 'bold',
+    color: AppColor.text,
+  },
+  boldAccent: {
+    fontWeight: 'bold',
+    color: AppColor.accent,
+  },
   safeArea: {
     flex: 1,
     backgroundColor: AppColor.background,
