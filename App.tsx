@@ -15,6 +15,7 @@ import AddSong from './components/songs_components/AddSong';
 import ChatTabView from './views/bottomtabs/ChatTabView';
 import ExerciseView from './views/learningtab/ExerciseView';
 import PianoPracticeView from './views/learningtab/PianoPracticeView';
+import CreatePracticeRoom from './views/communitytab/CreatePracticeRoom';
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -86,6 +87,11 @@ export default function App() {
               name="PianoPractice"
               component={PianoPracticeView}
               options={{ title: 'Piano Practice' }}
+            />
+            <Stack.Screen
+              name="CreatePracticeRoom"
+              component={CreatePracticeRoom}
+              options={{ title: 'Create Practice Room' }}
             />
           </>
         )}
