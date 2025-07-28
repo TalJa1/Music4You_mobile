@@ -12,7 +12,7 @@ import {
   FlatList,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
-import { useNavigation, NavigationProp } from '@react-navigation/native';
+import { useNavigation } from '@react-navigation/native';
 import React, { useState, useEffect } from 'react';
 import AppColor from '../../services/styles/AppColor';
 import { getPracticeRoomsByInstrument } from '../../apis/bottomtabs_api/practiceroom_api';
@@ -27,12 +27,9 @@ const INSTRUMENTS = [
   { key: 'flute', label: 'Flute' },
 ];
 
-type RootStackParamList = {
-  CreatePracticeRoom: undefined;
-  // ...other routes if needed
-};
+// Use the navigation prop without explicit typing to avoid duplicate RootStackParamList error
 const CommunityTabView = () => {
-  const navigation = useNavigation<NavigationProp<RootStackParamList>>();
+  const navigation: any = useNavigation();
   const [selectedInstrument, setSelectedInstrument] = useState('piano');
   const [rooms, setRooms] = useState<PracticeRoomInterface[]>([]);
   const [hostUsernames, setHostUsernames] = useState<{
@@ -103,7 +100,11 @@ const CommunityTabView = () => {
   }: {
     item: PracticeRoomInterface & { amounts?: number };
   }) => (
-    <View style={styles.roomCard}>
+    <TouchableOpacity
+      style={styles.roomCard}
+      activeOpacity={0.85}
+      onPress={() => navigation.navigate('PracticeRoomView', { room: item })}
+    >
       <View
         style={{
           flexDirection: 'row',
@@ -122,7 +123,7 @@ const CommunityTabView = () => {
       <Text style={styles.roomDetail}>
         Created: {new Date(item.created_at).toLocaleString()}
       </Text>
-    </View>
+    </TouchableOpacity>
   );
 
   return (
