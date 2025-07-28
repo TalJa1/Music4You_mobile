@@ -4,6 +4,7 @@ import { StyleSheet, Text, View, SafeAreaView, StatusBar, ScrollView, TouchableO
 import React, { useState, useEffect } from 'react';
 import AppColor from '../../services/styles/AppColor';
 import { getPracticeRoomsByInstrument } from '../../apis/bottomtabs_api/practiceroom_api';
+import { getUserById } from '../../apis/login/login_api';
 import { PracticeRoomInterface } from '../../services/models/API_Models';
 
 
@@ -18,6 +19,7 @@ const INSTRUMENTS = [
 const CommunityTabView = () => {
   const [selectedInstrument, setSelectedInstrument] = useState('piano');
   const [rooms, setRooms] = useState<PracticeRoomInterface[]>([]);
+  const [hostUsernames, setHostUsernames] = useState<{ [userId: number]: string }>({});
   const [loading, setLoading] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -28,6 +30,28 @@ const CommunityTabView = () => {
     try {
       const data = await getPracticeRoomsByInstrument(instrument);
       setRooms(data);
+      // Fetch usernames for unique host_user_ids
+      const uniqueHostIds = Array.from(new Set(data.map(room => room.host_user_id)));
+      const usernamesToFetch = uniqueHostIds.filter(id => !(id in hostUsernames));
+      if (usernamesToFetch.length > 0) {
+        const usernameResults = await Promise.all(
+          usernamesToFetch.map(async (id) => {
+            try {
+              const user = await getUserById(id);
+              return { id, username: user.username };
+            } catch {
+              return { id, username: `User ${id}` };
+            }
+          })
+        );
+        setHostUsernames(prev => {
+          const updated = { ...prev };
+          usernameResults.forEach(({ id, username }) => {
+            updated[id] = username;
+          });
+          return updated;
+        });
+      }
     } catch (err) {
       setError('Failed to load rooms');
       setRooms([]);
@@ -44,12 +68,15 @@ const CommunityTabView = () => {
 
   useEffect(() => {
     fetchRooms(selectedInstrument);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedInstrument]);
 
   const renderRoom = ({ item }: { item: PracticeRoomInterface }) => (
     <View style={styles.roomCard}>
       <Text style={styles.roomName}>{item.room_name}</Text>
-      <Text style={styles.roomDetail}>Host: {item.host_user_id}</Text>
+      <Text style={styles.roomDetail}>
+        Host: {hostUsernames[item.host_user_id] || `User ${item.host_user_id}`}
+      </Text>
       <Text style={styles.roomDetail}>Created: {new Date(item.created_at).toLocaleString()}</Text>
     </View>
   );
