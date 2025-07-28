@@ -35,6 +35,8 @@ const SongsTabView = () => {
   const [error, setError] = useState<string | null>(null);
   const [refreshing, setRefreshing] = useState<boolean>(false);
   const [openSheetId, setOpenSheetId] = useState<number | null>(null);
+  const [showWebViewId, setShowWebViewId] = useState<number | null>(null);
+  const [downloadedIds, setDownloadedIds] = useState<number[]>([]);
 
   const fetchSongs = async (showLoading = true) => {
     if (showLoading) setLoading(true);
@@ -117,53 +119,99 @@ const SongsTabView = () => {
           )}
           {!loading &&
             !error &&
-            songs.map(song => (
-              <View key={song.id} style={styles.songCard}>
-                <View style={styles.cardHeader}>
-                  <View style={styles.titleRow}>
-                    <Text style={styles.songTitle}>{song.title}</Text>
-                    <TouchableOpacity
-                      style={styles.sheetIconBtn}
-                      activeOpacity={0.7}
-                      onPress={() => {
-                        setOpenSheetId(
-                          openSheetId === song.id ? null : song.id,
-                        );
-                      }}
-                    >
-                      <Icon
-                        name="library-music"
-                        style={styles.sheetIcon}
-                        size={22}
-                        color={AppColor.buttonText}
+            songs.map(song => {
+              const isDownloaded = downloadedIds.includes(song.id);
+              return (
+                <View key={song.id} style={styles.songCard}>
+                  <View style={styles.cardHeader}>
+                    <View style={styles.titleRow}>
+                      <Text style={styles.songTitle}>{song.title}</Text>
+                      <TouchableOpacity
+                        style={styles.sheetIconBtn}
+                        activeOpacity={0.7}
+                        onPress={() => {
+                          setOpenSheetId(openSheetId === song.id ? null : song.id);
+                        }}
+                      >
+                        <Icon
+                          name="library-music"
+                          style={styles.sheetIcon}
+                          size={22}
+                          color={AppColor.buttonText}
+                        />
+                      </TouchableOpacity>
+                    </View>
+                    <Text style={styles.songArtist}>{song.artist}</Text>
+                    <View style={styles.levelBadge}>
+                      <Text style={styles.levelText}>{song.level}</Text>
+                    </View>
+                  </View>
+                  {song.video_id ? (
+                    <View style={styles.youtubeContainer}>
+                      <YoutubePlayer
+                        height={200}
+                        play={false}
+                        videoId={song.video_id}
                       />
-                    </TouchableOpacity>
-                  </View>
-                  <Text style={styles.songArtist}>{song.artist}</Text>
-                  <View style={styles.levelBadge}>
-                    <Text style={styles.levelText}>{song.level}</Text>
-                  </View>
+                    </View>
+                  ) : null}
+                  {/* Download button and WebView logic */}
+                  {openSheetId === song.id && song.sheet_url && (
+                    <View style={{ marginTop: 10 }}>
+                      {!isDownloaded && showWebViewId !== song.id && (
+                        <TouchableOpacity
+                          style={{
+                            backgroundColor: AppColor.primary,
+                            padding: 10,
+                            borderRadius: 8,
+                            alignItems: 'center',
+                          }}
+                          onPress={() => setShowWebViewId(song.id)}
+                          disabled={isDownloaded}
+                        >
+                          <Text style={{ color: AppColor.buttonText, fontWeight: 'bold' }}>
+                            Download Sheet
+                          </Text>
+                        </TouchableOpacity>
+                      )}
+                      {showWebViewId === song.id && !isDownloaded && (
+                        <View style={{ height: 400, marginTop: 10 }}>
+                          <WebView
+                            source={{ uri: song.sheet_url }}
+                            style={{ flex: 1, borderRadius: 8, overflow: 'hidden' }}
+                            startInLoadingState={true}
+                            onLoadEnd={() => {
+                              // Mark as downloaded and close WebView after a short delay
+                              setTimeout(() => {
+                                setDownloadedIds(prev => [...prev, song.id]);
+                                setShowWebViewId(null);
+                              }, 1500);
+                            }}
+                          />
+                          <TouchableOpacity
+                            style={{
+                              marginTop: 10,
+                              backgroundColor: AppColor.primary,
+                              padding: 8,
+                              borderRadius: 8,
+                              alignItems: 'center',
+                            }}
+                            onPress={() => setShowWebViewId(null)}
+                          >
+                            <Text style={{ color: AppColor.buttonText }}>Close</Text>
+                          </TouchableOpacity>
+                        </View>
+                      )}
+                      {isDownloaded && (
+                        <View style={{ marginTop: 10, alignItems: 'center' }}>
+                          <Text style={{ color: 'green', fontWeight: 'bold' }}>Downloaded</Text>
+                        </View>
+                      )}
+                    </View>
+                  )}
                 </View>
-                {song.video_id ? (
-                  <View style={styles.youtubeContainer}>
-                    <YoutubePlayer
-                      height={200}
-                      play={false}
-                      videoId={song.video_id}
-                    />
-                  </View>
-                ) : null}
-                {openSheetId === song.id && song.sheet_url && (
-                  <View style={{ display: 'none' }}>
-                    <WebView
-                      source={{ uri: song.sheet_url }}
-                      style={{ flex: 1 }}
-                      startInLoadingState={true}
-                    />
-                  </View>
-                )}
-              </View>
-            ))}
+              );
+            })}
         </View>
       </ScrollView>
     </SafeAreaView>
