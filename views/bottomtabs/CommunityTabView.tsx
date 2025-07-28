@@ -29,7 +29,9 @@ const CommunityTabView = () => {
     setError(null);
     try {
       const data = await getPracticeRoomsByInstrument(instrument);
-      setRooms(data);
+      // Add random amounts field to each room
+      const dataWithAmounts = data.map(room => ({ ...room, amounts: Math.floor(Math.random() * 51) + 50 }));
+      setRooms(dataWithAmounts);
       // Fetch usernames for unique host_user_ids
       const uniqueHostIds = Array.from(new Set(data.map(room => room.host_user_id)));
       const usernamesToFetch = uniqueHostIds.filter(id => !(id in hostUsernames));
@@ -71,9 +73,14 @@ const CommunityTabView = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedInstrument]);
 
-  const renderRoom = ({ item }: { item: PracticeRoomInterface }) => (
+  const renderRoom = ({ item }: { item: PracticeRoomInterface & { amounts?: number } }) => (
     <View style={styles.roomCard}>
-      <Text style={styles.roomName}>{item.room_name}</Text>
+      <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
+        <Text style={styles.roomName}>{item.room_name}</Text>
+        {typeof item.amounts === 'number' && (
+          <Text style={styles.amounts}>participants: {item.amounts}</Text>
+        )}
+      </View>
       <Text style={styles.roomDetail}>
         Host: {hostUsernames[item.host_user_id] || `User ${item.host_user_id}`}
       </Text>
@@ -217,6 +224,12 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: 'bold',
     marginBottom: 4,
+  },
+  amounts: {
+    color: AppColor.primary,
+    fontWeight: 'bold',
+    fontSize: 14,
+    marginLeft: 10,
   },
   roomDetail: {
     color: AppColor.textSecondary,
