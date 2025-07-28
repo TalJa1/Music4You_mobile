@@ -55,3 +55,13 @@ export interface ExerciseInterface {
   content: string
   id: number
 }
+
+export type PracticeRoomInterfaceArray = PracticeRoomInterface[]
+
+export interface PracticeRoomInterface {
+  room_name: string
+  host_user_id: number
+  instrument: string
+  id: number
+  created_at: string
+}
