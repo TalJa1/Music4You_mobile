@@ -97,11 +97,11 @@ const LoginView: React.FC<LoginViewProps> = ({ onLogin }) => {
                 <Icon name="music-note" size={48} color={AppColor.accent} />
               </View>
               <Text style={styles.appTitle}>
-                <Text style={{ fontWeight: 'bold' }}>music</Text>
+                <Text style={{ fontWeight: 'bold' }}>Music</Text>
                 <Text style={{ fontWeight: 'bold', color: AppColor.accent }}>
                   4
                 </Text>
-                <Text style={{ fontWeight: 'bold' }}>you</Text>
+                <Text style={{ fontWeight: 'bold' }}>You</Text>
               </Text>
             </View>
             <TextInput
