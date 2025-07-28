@@ -47,7 +47,7 @@ const CommunityTabView = () => {
       // Add random amounts field to each room
       const dataWithAmounts = data.map(room => ({
         ...room,
-        amounts: Math.floor(Math.random() * 51) + 50,
+        amounts: Math.floor(Math.random() * 10) + 1,
       }));
       setRooms(dataWithAmounts);
       // Fetch usernames for unique host_user_ids
