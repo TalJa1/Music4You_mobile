@@ -131,7 +131,12 @@ const SongsTabView = () => {
                         );
                       }}
                     >
-                      <Text style={styles.sheetIcon}>🎼</Text>
+                      <Icon
+                        name="library-music"
+                        style={styles.sheetIcon}
+                        size={22}
+                        color={AppColor.buttonText}
+                      />
                     </TouchableOpacity>
                   </View>
                   <Text style={styles.songArtist}>{song.artist}</Text>
