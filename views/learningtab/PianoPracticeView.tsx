@@ -29,7 +29,7 @@ const PianoPracticeView = () => {
   const navigation = useNavigation();
   const [currentNote, setCurrentNote] = useState<string | null>(null);
   const [answered, setAnswered] = useState<{ [note: string]: boolean }>({});
-  const [showKeyNames, setShowKeyNames] = useState<boolean>(true);
+  const [showKeyNames, setShowKeyNames] = useState<boolean>(false);
 
   React.useEffect(() => {
     if (Platform.OS === 'android') {
