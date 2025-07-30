@@ -30,7 +30,8 @@ const LoginView: React.FC<LoginViewProps> = ({ onLogin }) => {
   useEffect(() => {
     GoogleSignin.configure({
       webClientId:
-        '646507716060-re82eq5vqplqp7vcvlafpm673tt38tj3.apps.googleusercontent.com',
+        // '646507716060-re82eq5vqplqp7vcvlafpm673tt38tj3.apps.googleusercontent.com',
+        "646507716060-8hf0qvcaa0co9qi73qahhtt8dagj29c8.apps.googleusercontent.com",
       offlineAccess: false,
       forceCodeForRefreshToken: false,
     });
