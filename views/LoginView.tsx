@@ -41,7 +41,7 @@ const LoginView: React.FC<LoginViewProps> = ({ onLogin }) => {
       await GoogleSignin.hasPlayServices();
       const userInfo = await GoogleSignin.signIn();
       const email = userInfo.data?.user.email;
-      console.log('User Email:', email);
+      // console.log('User data from Google:', userInfo.data?.user);
       let user = null;
       try {
         user = await getUserByEmail(email);
@@ -72,7 +72,7 @@ const LoginView: React.FC<LoginViewProps> = ({ onLogin }) => {
       }
     } catch (error: any) {
       if (error.code === statusCodes.SIGN_IN_CANCELLED) {
-        // user cancelled the login flow
+        console.log('User cancelled the sign-in flow');
       } else if (error.code === statusCodes.IN_PROGRESS) {
         Alert.alert('Sign in is in progress');
       } else if (error.code === statusCodes.PLAY_SERVICES_NOT_AVAILABLE) {

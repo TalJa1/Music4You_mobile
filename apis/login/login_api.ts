@@ -17,5 +17,6 @@ export const getUserByEmail = async (
   if (!email) {
     throw new Error('Email is required');
   }
+  // console.log(`Fetching user by email: ${email}`);
   return await axiosClient.get(`/users/by-email/${email}`);
 };
