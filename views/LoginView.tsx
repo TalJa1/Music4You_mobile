@@ -94,7 +94,7 @@ const LoginView: React.FC<LoginViewProps> = ({ onLogin }) => {
           <View style={styles.card}>
             <View style={styles.logoContainer}>
               <View style={styles.logoCircle}>
-                <Icon name="music-note" size={48} color={AppColor.accent} />
+                <Icon name="music-note" size={48} color={AppColor.text} />
               </View>
               <Text style={styles.appTitle}>
                 <Text style={{ fontWeight: 'bold' }}>Music</Text>
